@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ character.name }} - Watch Note</title>
+<style>
+    :root {
+        --accent-color: #d4a373;
+        --bg-dark: #141414;
+        --card-bg: #1f1f1f;
+        --text-main: #f5f5dc;
+        --text-dim: #e5e5e5;
+        --glass-bg: rgba(31, 31, 31, 0.7);
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-dark);
+        background-image: radial-gradient(circle at top left, #1a1a2e, #141414);
+        color: var(--text-main);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        box-sizing: border-box;
+    }
+
+    .character-container {
+        max-width: 900px;
+        width: 100%;
+        background: var(--glass-bg);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        border-radius: 24px;
+        border: 1px solid rgba(212, 163, 115, 0.15);
+        padding: 40px;
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        animation: widgetRise 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes widgetRise {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .character-image-wrapper {
+        flex: 1;
+        min-width: 250px;
+        max-width: 300px;
+    }
+
+    .char-img {
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        border: 1px solid rgba(212, 163, 115, 0.2);
+        transition: transform 0.4s ease;
+    }
+
+    .char-img:hover {
+        transform: scale(1.02);
+        border-color: var(--accent-color);
+        box-shadow: 0 15px 40px rgba(212, 163, 115, 0.2);
+    }
+
+    .character-info {
+        flex: 2;
+        min-width: 300px;
+    }
+
+    h1 {
+        font-size: 3rem;
+        margin: 0 0 5px 0;
+        color: #fff;
+        text-shadow: 0 0 15px rgba(212, 163, 115, 0.3);
+    }
+
+    .char-role {
+        font-size: 1.2rem;
+        color: var(--accent-color);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        display: inline-block;
+        border-bottom: 1px solid rgba(212, 163, 115, 0.3);
+        padding-bottom: 5px;
+    }
+
+    .char-desc {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: var(--text-dim);
+        margin-bottom: 30px;
+    }
+
+    .anime-link {
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        border: 1px solid var(--accent-color);
+        color: var(--accent-color);
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .anime-link:hover {
+        background: var(--accent-color);
+        color: #141414;
+        box-shadow: 0 0 15px rgba(212, 163, 115, 0.5);
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .character-container {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .character-image-wrapper {
+            margin: 0 auto;
+        }
+        .char-role {
+            margin-top: 10px;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <div class="character-container">
+
+<div class="character-image-wrapper">
+            {% if character.photo %}
+                <img src="{{ character.photo.url }}" alt="{{ character.name }}" class="char-img">
+            {% else %}
+                <div class="char-img" style="background: rgba(0,0,0,0.5); height: 400px; display: flex; align-items: center; justify-content: center; color: var(--accent-color); opacity: 0.5;">
+                    Немає фото
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="character-info">
+            <h1>{{ character.name }}</h1>
+            <div class="char-role">{{ character.role }}</div>
+
+            <div class="char-desc">
+                {% if character.description %}
+                    {{ character.description|linebreaks }}
+                {% else %}
+                    <p style="font-style: italic; opacity: 0.6;">Біографія цього персонажа ще оповита таємницею...</p>
+                {% endif %}
+            </div>
+
+            {% if character.anime %}
+                <a href="{% url 'anime:anime_detail' character.anime.pk %}" class="anime-link">
+                    ← Повернутися до {{ character.anime.title }}
+                </a>
+            {% else %}
+                <a href="javascript:history.back()" class="anime-link">← Назад</a>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>

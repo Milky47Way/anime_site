@@ -16,6 +16,7 @@ class Character(models.Model):
         verbose_name='Аніме'
     )
 
+
     def __str__(self):
         return self.name
 

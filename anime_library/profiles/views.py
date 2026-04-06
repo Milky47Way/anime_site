@@ -13,17 +13,16 @@ class ProfileListView(ListView):
 
 # 1. Сторінка "Мій список"
 class WatchlistView(LoginRequiredMixin, ListView):
-    template_name = 'anime/anime_list.html'  # Хитрий хід: використовуємо твій готовий скляний шаблон!
+    template_name = 'anime/anime_list.html'  # Використовуємо твій скляний дизайн
     context_object_name = 'object_list'
 
     def get_queryset(self):
-        # Віддаємо тільки те, що є в списку користувача
+
         return self.request.user.profile.watchlist.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Використовуємо твою плашку пошуку для гарного заголовка
-        context['search_query'] = 'Мій список збереженого'
+        context['page_title'] = 'Список збереженого'
         return context
 
 @login_required
@@ -32,17 +31,17 @@ def toggle_watchlist(request, pk):
     profile = request.user.profile
 
     if anime in profile.watchlist.all():
-        profile.watchlist.remove(anime)  # Якщо є - прибираємо
+        profile.watchlist.remove(anime)
     else:
-        profile.watchlist.add(anime)  # Якщо немає - додаємо
+        profile.watchlist.add(anime)
 
-    # Повертаємо користувача на ту ж сторінку, де він натиснув кнопку
+
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = Profile
     template_name = 'profiles/settings.html'
-    # Змінюємо 'photo' на 'avatar', як у твоїй моделі!
+
     fields = ['avatar', 'bio', 'birth_date', 'status_message']
     success_url = reverse_lazy('user:profile_detail')
 

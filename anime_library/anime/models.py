@@ -41,7 +41,8 @@ class Anime(models.Model):
 
     TYPE_CHOICES = [('TV', 'Серіал'), ('MOVIE', 'Фільм'), ('OVA', 'OVA')]
     anime_type = models.CharField("Тип", max_length=10, choices=TYPE_CHOICES, default='TV')
-    episodes = models.PositiveIntegerField("Кількість серій", default=1)
+    episodes = models.PositiveIntegerField("Кількість серій", default=0)
+    movies_count = models.PositiveIntegerField("Кількість фільмів", default=0)
 
     genres = models.ManyToManyField(Genre, related_name="anime", verbose_name="Жанри")
     authors = models.ManyToManyField(Author, related_name="anime", verbose_name="Автори")
@@ -60,3 +61,7 @@ class Anime(models.Model):
         verbose_name_plural = "Аніме"
 
     def __str__(self): return self.title
+
+
+class Review:
+    pass

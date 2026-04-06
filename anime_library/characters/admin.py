@@ -6,3 +6,5 @@ class CharacterAdmin(admin.ModelAdmin):
     list_display = ('name', 'role', 'anime')
     list_filter = ('role', 'anime')
     search_fields = ('name',)
+
+
