@@ -93,7 +93,6 @@
         color: var(--text-dim);
     }
 
-    /* Жанри як теги */
     .genre-list {
         list-style: none;
         padding: 0;
@@ -238,11 +237,16 @@
                 </div>
 
               <h3>Жанри</h3>
-                <ul class="genre-list">
-                    {% for genre in anime.genres.all %}
-                        <li><a href="{% url 'anime:anime_list' %}?q={{ genre.name }}" style="color: inherit; text-decoration: none; display: block; width: 100%; height: 100%;">{{ genre.name }}</a></li>
-                    {% endfor %}
-                </ul>
+<ul class="genre-list">
+    {% for genre in anime.genres.all %}
+        <li>
+            <a href="{% url 'anime:anime_by_genre' genre.id %}"
+               style="color: inherit; text-decoration: none; display: block; width: 100%; height: 100%;">
+                {{ genre.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
 
                 {% if anime.trailer_url %}
                     <a href="{{ anime.trailer_url }}" target="_blank" class="trailer-btn">Дивитися трейлер</a>
@@ -309,23 +313,22 @@
             <p style="text-align: center; opacity: 0.6; margin-bottom: 30px;">
                 <a href="{% url 'login' %}" style="color: var(--accent-color);">Увійди</a>, щоб залишити відгук.
             </p>
-        {% endif %}
+{% endif %}
 
-        {% for review in reviews %}
-            <div class="review-box">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <strong style="color: var(--accent-color);">{{ review.user.username }}</strong>
-                    <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10 ★</span>
-                </div>
-                <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
-                <div style="margin-top: 10px; text-align: right;">
-                    <small style="opacity: 0.5;">{{ review.created_at|date:"d.m.Y" }}</small>
-                </div>
+    {% for review in reviews %}
+        <div class="review-box">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <strong style="color: var(--accent-color);">{{ review.user.username }}</strong>
+                <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10 ★</span>
             </div>
-        {% empty %}
-            <p style="text-align: center; opacity: 0.5; padding: 20px;">Поки що немає відгуків</p>
-        {% endfor %}
+            <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
+            <div style="margin-top: 10px; text-align: right;">
+                <small style="opacity: 0.5;">{{ review.created_at|date:"d.m.Y" }}</small>
+            </div>
+        </div> {% empty %}
+        <p style="text-align: center; opacity: 0.5; padding: 20px;">Поки що немає відгуків</p>
+    {% endfor %}
 
-        <a href="{% url 'anime:anime_list' %}" class="back-link">← Повернутися до бібліотеки</a>
+    <a href="{% url 'anime:anime_list' %}" class="back-link">← Повернутися до бібліотеки</a>
     </body>
 </html>
