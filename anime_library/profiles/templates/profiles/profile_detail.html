@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Мій профіль</title>
+<style>
+    body {
+        margin: 0;
+        padding: 100px 20px;
+        background-color: #1a1a2e;
+        color: #f5f5dc;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .profile-card {
+        background: rgba(245, 245, 220, 0.15);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(212, 163, 115, 0.4);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+        color: #d4a373;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+    .btn-back {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 25px;
+        background: #d4a373;
+        color: white;
+        text-decoration: none;
+        border-radius: 15px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .btn-back:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 0 15px rgba(212, 163, 115, 0.4);
+    }
+</style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <h1>Профіль: {{ user.username }}</h1>
+
+        <p style="opacity: 0.8; font-size: 1.1em;">Вітаю! Тут згодом буде ваша статистика..</p>
+
+        <a href="{% url 'anime:anime_list' %}" class="btn-back">Жамк</a>
+    </div>
+
+</body>
+</html>

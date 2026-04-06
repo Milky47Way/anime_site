@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Watch Note</title>
+<style>
+    :root {
+        --accent-color: #d4a373;
+        --gold-glow: rgba(212, 163, 115, 0.4);
+        --glass-bg: rgba(245, 245, 220, 0.15);
+        --glass-hover: rgba(245, 245, 220, 0.25);
+    }
+
+    body {
+        margin: 0;
+        padding: 120px 20px 40px;
+        color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #1a1a2e;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://i.pinimg.com/736x/ac/3b/46/ac3b465eba3206321fa1a2dc49c08fff.jpg');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        transform: rotate(270deg) scale(2.2);
+        transform-origin: center;
+        z-index: -1;
+        pointer-events: none;
+        filter: brightness(0.5);
+    }
+
+
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: var(--glass-bg);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(245, 245, 220, 0.2);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        padding: 15px 0;
+    }
+
+    .nav-list {
+        display: flex;
+        gap: 25px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+    }
+
+    .nav-link {
+        color: #f5f5dc;
+        text-decoration: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.85em;
+        transition: 0.3s;
+        padding: 10px 20px;
+        border-radius: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .nav-link:hover {
+        background: var(--glass-hover);
+        text-shadow: 0 0 10px rgba(245, 245, 220, 0.5);
+        transform: translateY(-2px);
+    }
+
+
+    .search-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input-wrapper {
+        width: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Клас, який додає JS для відкриття */
+    .search-input-wrapper.active {
+        width: 220px;
+        opacity: 1;
+        margin-left: 10px;
+    }
+
+    .search-input {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--accent-color);
+        border-radius: 20px;
+        padding: 6px 15px;
+        color: #f5f5dc;
+        outline: none;
+        width: 150px;
+        font-size: 0.9em;
+    }
+
+    h1 {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 6px;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        margin-bottom: 50px;
+    }
+
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 35px;
+        list-style: none;
+        padding: 0 20px;
+        position: relative;
+        z-index: 10;
+    }
+
+
+    .anime-card {
+        background: rgba(245, 245, 220, 0.12);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(245, 245, 220, 0.2);
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+
+        opacity: 0;
+        animation: widgetRise 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+
+
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                    box-shadow 0.4s ease,
+                    border-color 0.4s ease,
+                    background 0.4s ease;
+    }
+
+
+    @keyframes widgetRise {
+        0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .anime-card:nth-child(1) { animation-delay: 0.1s; }
+    .anime-card:nth-child(2) { animation-delay: 0.2s; }
+    .anime-card:nth-child(3) { animation-delay: 0.3s; }
+    .anime-card:nth-child(4) { animation-delay: 0.4s; }
+    .anime-card:nth-child(5) { animation-delay: 0.5s; }
+    .anime-card:nth-child(6) { animation-delay: 0.6s; }
+
+    .anime-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        background: rgba(245, 245, 220, 0.22);
+        border-color: var(--accent-color);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 20px var(--gold-glow);
+        z-index: 20;
+    }
+
+    .anime-title { font-size: 1.2em; margin-bottom: 5px; display: block; color: #fff; }
+    .anime-meta { font-size: 0.85em; margin: 10px 0; opacity: 0.8; line-height: 1.5; border-top: 1px solid rgba(245, 245, 220, 0.1); padding-top: 10px; }
+    .rating { color: #f9d71c; font-weight: bold; margin: 10px 0; font-size: 1.1em; }
+
+    .btn-detail {
+        margin-top: auto;
+        padding: 12px;
+        background: var(--accent-color);
+        color: white !important;
+        text-decoration: none;
+        border-radius: 15px;
+        text-align: center;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-detail:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--gold-glow); }
+</style>
+</head>
+<body>
+
+    <nav class="nav-menu">
+        <ul class="nav-list">
+            <li><a href="{% url 'anime:anime_list' %}" class="nav-link">Головна</a></li>
+            <li><a href="#" class="nav-link">Мій список</a></li>
+
+            <li class="search-container">
+                <button id="search-trigger" class="nav-link">Пошук</button>
+
+                <div id="search-wrapper" class="search-input-wrapper {% if search_query %}active{% endif %}">
+                    <form action="{% url 'anime:anime_list' %}" method="get" style="display: flex; gap: 8px;">
+                        <input type="text" name="q" placeholder="Введіть назву..."
+                               value="{{ search_query|default:'' }}" class="search-input">
+                        <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.2em;"></button>
+                    </form>
+                </div>
+            </li>
+
+           {% if user.is_authenticated %}
+            <li><a href="{% url 'profiles:profile_detail' user.profile.pk %}" class="nav-link">Профіль ({{ user.username }})</a></li>
+
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display:inline; margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link" style="color: var(--accent-color); padding-left: 0;">Вийти</button>
+                </form>
+            </li>
+        {% else %}
+            <li><a href="{% url 'login' %}" class="nav-link">Увійти</a></li>
+            <li><a href="#" class="nav-link" style="color: var(--accent-color);">Реєстрація</a></li>
+        {% endif %} </ul>
+    </nav>
+
+    <h1>Охайоо, тайм-аут?</h1>
+
+    {% if search_query %}
+        <div style="text-align: center; margin-bottom: 30px; animation: widgetRise 0.5s;">
+            <span style="color: var(--accent-color); font-size: 1.2em;">Знайдено за вашим запитом: "{{ search_query }}"</span>
+            <br>
+            <a href="{% url 'anime:anime_list' %}" style="color: #fff; opacity: 0.5; font-size: 0.9em; text-decoration: underline;">Скинути фільтр</a>
+        </div>
+    {% endif %}
+
+    <ul class="anime-grid">
+        {% for anime in object_list %}
+            <li class="anime-card">
+                <strong class="anime-title">{{ anime.title }}</strong>
+                <span style="opacity: 0.7;">{{ anime.release|date:"Y" }} рік</span>
+
+                <div class="anime-meta">
+                    <div><strong>Тип:</strong> {{ anime.get_anime_type_display }}</div>
+                    <div><strong>Серій:</strong> {{ anime.episodes }}</div>
+                    <div><strong>Автор:</strong>
+                        {% for author in anime.authors.all %}
+                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Не вказано
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <p class="rating">★ {{ anime.rating|default:"0.0" }} / 10</p>
+                <p style="font-size: 0.9em; opacity: 0.9; margin-bottom: 20px;">
+                    {{ anime.description|truncatewords:12 }}
+                </p>
+
+                <a href="{% url 'anime:anime_detail' anime.pk %}" class="btn-detail">Детальніше</a>
+            </li>
+        {% empty %}
+            <li style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0; animation: widgetRise 0.5s forwards;">
+                <p style="font-size: 1.5em; opacity: 0.5;">Ой, ми нічого не знайшли.. </p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        const trigger = document.getElementById('search-trigger');
+        const wrapper = document.getElementById('search-wrapper');
+        const input = wrapper.querySelector('input');
+
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            wrapper.classList.toggle('active');
+
+            if (wrapper.classList.contains('active')) {
+                input.focus();
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ anime.title }} - інформація </title>
+<style>
+    :root {
+        --accent-color: #d4af37;
+        --bg-dark: #141414;
+        --card-bg: #1f1f1f;
+        --text-main: #f5f5dc;
+        --text-dim: #e5e5e5;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-dark);
+        background-image: radial-gradient(circle at top right, #1a1a1a, #141414);
+        color: var(--text-main);
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .anime-container {
+        max-width: 1100px;
+        width: 95%;
+        margin: 40px auto;
+        padding: 40px;
+        box-sizing: border-box;
+        background: rgba(31, 31, 31, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        border-radius: 12px;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    /* Сетка для хедера: текст слева, постер справа */
+    .anime-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        align-items: flex-start;
+        margin-bottom: 40px;
+    }
+
+    .anime-info-main {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .anime-poster-wrapper {
+        flex-shrink: 0;
+    }
+
+    h1 {
+        font-size: 3.5rem;
+        color: #fff;
+        margin: 0 0 20px 0;
+        line-height: 1.1;
+        text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+    }
+
+    .poster-img {
+        display: block;
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .poster-img:hover {
+        transform: scale(1.03);
+    }
+
+    h3 {
+        color: var(--accent-color);
+        margin-top: 30px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 1.1rem;
+        border-left: 3px solid var(--accent-color);
+        padding-left: 15px;
+    }
+
+    p, li {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: var(--text-dim);
+    }
+
+    /* Жанри як теги */
+    .genre-list {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .genre-list li {
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: var(--text-main);
+        padding: 6px 18px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+
+    .genre-list li:hover {
+        background: var(--accent-color);
+        color: var(--bg-dark);
+    }
+
+    .rating-badge {
+        display: inline-block;
+        background: var(--accent-color);
+        color: #000;
+        padding: 5px 12px;
+        border-radius: 4px;
+        font-weight: 800;
+        margin-right: 10px;
+    }
+
+    .trailer-btn {
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        border: 2px solid var(--accent-color);
+        color: var(--accent-color) !important;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 20px;
+        transition: 0.3s;
+    }
+
+    .trailer-btn:hover {
+        background: var(--accent-color);
+        color: var(--bg-dark) !important;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    }
+
+    hr {
+        border: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3), transparent);
+        margin: 40px 0;
+    }
+
+    .review-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: 0.3s;
+    }
+
+    .review-box:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 50px;
+        opacity: 0.6;
+        font-size: 0.9rem;
+    }
+
+    a {
+        color: var(--accent-color);
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    a:hover {
+        color: #fff;
+    }
+
+    .anime-extra-info {
+        margin-top: 15px;
+        font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .anime-header {
+            flex-direction: column-reverse;
+            text-align: center;
+        }
+        .anime-poster-wrapper {
+            margin: 0 auto;
+        }
+        h1 { font-size: 2.5rem; }
+        h3 { border-left: none; padding-left: 0; }
+        .genre-list { justify-content: center; }
+    }
+</style>
+</head>
+<body>
+
+    <div class="anime-container">
+        <div class="anime-header">
+            <div class="anime-info-main">
+                <h1>{{ anime.title }}</h1>
+
+                <p><span class="rating-badge">{{ anime.rating }}/10 ★</span>
+                   <strong>Дата релізу:</strong> {{ anime.release|date:"Y" }}</p>
+
+                <div class="anime-extra-info">
+                    <p><strong>Тип:</strong> {{ anime.get_anime_type_display }}</p>
+                    <p><strong>Кількість серій:</strong> {{ anime.episodes }}</p>
+                    <p><strong>Автор:</strong>
+                        {% for author in anime.authors.all %}
+                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Не вказано
+                        {% endfor %}
+                    </p>
+                </div>
+
+                <h3>Жанри</h3>
+                <ul class="genre-list">
+                    {% for genre in anime.genres.all %}
+                        <li>{{ genre.name }}</li>
+                    {% endfor %}
+                </ul>
+
+                {% if anime.trailer_url %}
+                    <a href="{{ anime.trailer_url }}" target="_blank" class="trailer-btn">Дивитися трейлер</a>
+                {% endif %}
+            </div>
+
+            {% if anime.poster %}
+            <div class="anime-poster-wrapper">
+                <img src="{{ anime.poster.url }}" alt="{{ anime.title }}" class="poster-img">
+            </div>
+            {% endif %}
+        </div>
+
+        <h3>Опис</h3>
+        <p>{{ anime.description }}</p>
+
+        <hr>
+
+        <h3>Персонажі</h3>
+        <ul style="list-style: none; padding: 0;">
+            {% for character in characters %}
+                <li style="margin-bottom: 12px;">
+                    <strong style="color: #fff;">{{ character.name }}</strong>
+                    <span style="color: var(--accent-color); opacity: 0.8; margin-left: 10px;">— {{ character.role }}</span>
+                </li>
+            {% empty %}
+                <li>Герої ще не додані до цього аніме</li>
+            {% endfor %}
+        </ul>
+
+        <hr>
+
+        <h3>Відгуки глядачів</h3>
+        {% for review in reviews %}
+            <div class="review-box">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <strong style="color: var(--accent-color);">{{ review.user.username }}</strong>
+                    <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10</span>
+                </div>
+                <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
+                <div style="margin-top: 10px; text-align: right;">
+                    <small style="opacity: 0.5;">{{ review.created_at|date:"d.m.Y" }}</small>
+                </div>
+            </div>
+        {% empty %}
+            <p>Поки що немає відгуків</p>
+        {% endfor %}
+
+        <a href="{% url 'anime:anime_list' %}" class="back-link">← Повернутися до бібліотеки</a>
+    </div>
+
+</body>
+</html>
