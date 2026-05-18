@@ -5,8 +5,8 @@ class Character(models.Model):
     age = models.PositiveSmallIntegerField("Вік", null=True, blank=True)
     role = models.CharField("Роль", max_length=250)
     description = models.TextField("Опис", blank=True)
-
-    family = models.ManyToManyField('self', blank=True, symmetrical=True, verbose_name="Родичі")
+    birthday = models.DateField("День народження", null=True, blank=True)
+    family = models.ManyToManyField('self', blank=True, symmetrical=True, verbose_name="Сім'я")
     photo = models.ImageField(upload_to='images/characters/', null=True, blank=True)
 
     anime = models.ForeignKey(

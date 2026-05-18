@@ -24,13 +24,8 @@ SECRET_KEY = 'django-insecure-mzhz0+_f^!a3-2tfdtre(g)xe0gf&+=*_4)&ukmh!du6kj5ikt
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = []
-
-
-# Application definition
-
-# ... (начало файла без изменений)
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,11 +69,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'anime_library.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -101,30 +91,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
+LANGUAGE_CODE = 'uk'
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = 'anime:anime_list'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'anime:anime_list'
 
-LOGIN_REDIRECT_URL = '/anime/'
-LOGOUT_REDIRECT_URL = '/anime/'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-#cd anime_library
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'anime4.7site@gmail.com'
+EMAIL_HOST_PASSWORD = 'joua uems civj aljt'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
