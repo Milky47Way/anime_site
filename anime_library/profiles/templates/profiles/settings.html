@@ -1,21 +1,93 @@
-<h1>⚙️ Налаштування профілю</h1>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Налаштування профілю: {{ profile.nickname }}</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500&display=swap');
+    :root { --widget-bg: rgba(10, 10, 15, 0.85); --border-gold: rgba(181, 154, 109, 0.3); --accent: #d4a373; }
+    body { margin: 0; background: #050508; color: #e0e0e0; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .settings-container { width: 100%; max-width: 600px; background: var(--widget-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-gold); border-radius: 30px; padding: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
+    h1 { font-family: 'Space Grotesk', sans-serif; letter-spacing: 3px; border-bottom: 1px solid var(--border-gold); padding-bottom: 15px; }
+    .form-group p { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+    input, textarea { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(181, 154, 109, 0.2); border-radius: 12px; padding: 12px; color: #fff; outline: none; }
+    #avatar-preview { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; border: 1px solid var(--border-gold); margin-bottom: 10px; }
+    .btn-save { width: 100%; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
 
-<h2>Змінити дані</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ user_form.as_p }}
+    .avatar-placeholder {
+        width: 120px; height: 120px; border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px dashed var(--border-gold);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 10px; color: var(--accent); font-size: 0.8rem;
+    }
+</style>
+</head>
+<body>
+    <div class="settings-container">
+        <h1>Налаштування</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <p><label>Нікнейм</label><input type="text" name="nickname" value="{{ profile.nickname }}"></p>
+                <p>
+                    <label>Аватар</label>
+                    <div style="text-align: center;">
+                        {% if profile.avatar %}
+                            <img id="avatar-preview" src="{{ profile.avatar.url }}" style="width: 120px; height: 120px; border-radius: 20px; object-fit: cover; border: 1px solid var(--border-gold); margin-bottom: 10px;">
+                        {% else %}
+                            <div id="avatar-preview-placeholder" class="avatar-placeholder">пропало всьо</div>
+                            <img id="avatar-preview" src="" style="display: none; width: 120px; height: 120px; border-radius: 20px; object-fit: cover; border: 1px solid var(--border-gold); margin: 0 auto 10px;">
+                        {% endif %}
+                    </div>
 
-    <button type="submit">Зберегти</button>
-</form>
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*">
 
-<hr>
+                    <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(181, 154, 109, 0.1);">
+                        <input type="checkbox" name="avatar-clear" id="avatar-clear_id" style="width: auto; cursor: pointer;">
+                        <label for="avatar-clear_id" style="text-transform: none; letter-spacing: 0; color: #ccc; cursor: pointer;">Видалити поточний аватар</label>
+                    </div>
+                </p>
+                <p><label>Цитата</label><textarea name="bio" rows="3">{{ profile.bio }}</textarea></p>
 
-<h2>Змінити пароль</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ password_form.as_p }}
+                <p><label>Регіон</label><input type="text" name="region" value="{{ profile.region|default:'Священні землі' }}"></p>
 
-    <button type="submit">Змінити пароль</button>
-</form>
+                <p><label>День народження</label><input type="date" name="birth_date" value="{{ profile.birth_date|date:'Y-m-d' }}"></p>
+            </div>
+            <button type="submit" class="btn-save">Зберегти зміни</button>
+        </form>
 
-<a href="{% url 'user:profile_detail' pk=user.profile.pk %}">⬅️ Назад</a>
+        <div class="danger-zone" style="margin-top: 40px; border-top: 1px solid rgba(122, 82, 48, 0.25); padding-top: 30px; text-align: left;">
+            <h2 style="font-family: 'Space Grotesk', sans-serif; color: #9c6644; letter-spacing: 2px; font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase;">Зона ісекаю</h2>
+            <p style="font-size: 0.8em; color: rgba(224, 224, 220, 0.5); margin-bottom: 20px; line-height: 1.5;">
+                Видалення акаунту призведе до повної втрати вашого профілю, коментарів та списків аніме. Твій номер звільниться для інших користувачів. Цю дію неможливо скасувати.
+            </p>
+            <form action="{% url 'profiles:delete_account' %}" method="post" onsubmit="return confirm('Видатили?');">
+                {% csrf_token %}
+                <button type="submit" style="width: 100%; background: rgba(122, 82, 48, 0.08); color: #9c6644; border: 1px solid #9c6644; padding: 14px; border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;" onmouseenter="this.style.background='#9c6644'; this.style.color='#000'; this.style.boxShadow='0 0 25px rgba(156, 102, 68, 0.4)';" onmouseleave="this.style.background='rgba(122, 82, 48, 0.08)'; this.style.color='#9c6644'; this.style.boxShadow='none';">
+                    Видалити акаунт
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('avatar-input').onchange = function(evt) {
+            const [file] = this.files;
+            if (file) {
+                const preview = document.getElementById('avatar-preview');
+                const placeholder = document.getElementById('avatar-preview-placeholder');
+
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+                preview.style.margin = '0 auto 10px';
+
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+            }
+        };
+    </script>
+</body>
+</html>

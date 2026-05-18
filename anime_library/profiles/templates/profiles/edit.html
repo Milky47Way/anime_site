@@ -8,3 +8,9 @@
 </form>
 
 <a href="{% url 'character_detail' object.id %}">Назад</a>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Підтвердити</button>
+</form>

@@ -1,45 +1,435 @@
-<h1>Профіль: {{ user.username }}</h1>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Мій список | Watch Note</title>
+<style>
+    :root {
+        --accent-color: #d4a373;
+        --gold-glow: rgba(212, 163, 115, 0.4);
+        --glass-bg: rgba(245, 245, 220, 0.12);
+        --glass-hover: rgba(245, 245, 220, 0.22);
+    }
 
-<a href="{% url 'user:profile_settings' %}">
+    body {
+        margin: 0;
+        padding: 140px 20px 40px; /* Збільшили верхній відступ, щоб контент ідеально дихав */
+        color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #050505;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
 
-<form method="post">
-    {% csrf_token %}
+    /* Твій фірмовий фон, один в один як на головній */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 50px; left: 0; width: 100%; height: 100%;
+        background-image: url('https://i.pinimg.com/736x/ac/3b/46/ac3b465eba3206321fa1a2dc49c08fff.jpg');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        transform: rotate(270deg) scale(2.2);
+        transform-origin: center;
+        z-index: -1;
+        pointer-events: none;
+        filter: brightness(0.4) saturate(1.2);
+    }
 
-    <table border="1">
-        <tr>
-            <th>Аніме</th>
-            <th>Статус</th>
-            <th>Рейтинг</th>
-            <th>Серії</th>
-            <th>Коментар</th>
-        </tr>
+    .nav-menu {
+        position: fixed;
+        top: 0; left: 0; width: 100%;
+        background: rgba(15, 15, 15, 0.7);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(212, 163, 115, 0.1);
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+    }
 
-        {% for item in anime_list %}
-        <tr>
-            <td>{{ item.anime.title }}</td>
+    .nav-list {
+        display: flex;
+        gap: 40px;
+        list-style: none;
+        margin: 0; padding: 0;
+        align-items: center;
+    }
 
-            <td>
-                <select name="status_{{ item.id }}">
-                    {% for key, value in item.STATUS_CHOICES %}
-                        <option value="{{ key }}" {% if item.status == key %}selected{% endif %}>
-                            {{ value }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </td>
+    .nav-link {
+        color: #f5f5dc;
+        text-decoration: none;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        font-weight: 500;
+        transition: 0.3s;
+    }
 
-            <td>⭐️ {{ item.rating|default:"-" }}</td>
+    .nav-link:hover { color: var(--accent-color); }
 
-            <td>
-                <input type="number" name="episodes_{{ item.id }}" value="{{ item.episodes_watched }}">
-            </td>
+    .user-profile { display: flex; align-items: center; gap: 10px; }
+    .avatar-circle { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent-color); }
 
-            <td>
-                <input type="text" name="comment_{{ item.id }}" value="{{ item.comment }}">
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    /* Заголовок тепер стоїть першим і задає правильний тон */
+    h1 {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 6px;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        margin-top: 0;
+        margin-bottom: 30px; /* Чіткий фіксований відступ до вкладок */
+    }
 
-    <button type="submit">💾 Зберегти</button>
-</form>
+    /* Контейнер вкладок опустився під заголовок і більше не лізе під шапку */
+    .filter-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 45px; /* Чіткий відступ до карток */
+        position: relative;
+        z-index: 10;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 163, 115, 0.2);
+        color: #f5f5dc;
+        padding: 10px 24px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+        background: var(--accent-color);
+        color: #050505;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px var(--gold-glow);
+        font-weight: 600;
+    }
+
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 35px;
+        list-style: none;
+        padding: 0 6px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .anime-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(245, 245, 220, 0.2);
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-sizing: border-box;
+        opacity: 0;
+        animation: widgetRise 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                    box-shadow 0.4s ease,
+                    border-color 0.4s ease,
+                    background 0.4s ease;
+        position: relative;
+    }
+
+    @keyframes widgetRise {
+        0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .anime-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        background: var(--glass-hover);
+        border-color: var(--accent-color);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 20px var(--gold-glow);
+        z-index: 20;
+    }
+
+    .anime-title { font-size: 1.2em; margin-bottom: 5px; display: block; color: #fff; font-weight: 600; }
+    .anime-meta { font-size: 0.85em; margin: 10px 0; opacity: 0.8; line-height: 1.5; border-top: 1px solid rgba(245, 245, 220, 0.1); padding-top: 10px; }
+    .rating { color: #f9d71c; font-weight: bold; margin: 10px 0; font-size: 1.1em; }
+
+    .btn-detail {
+        margin-top: auto;
+        padding: 12px;
+        background: var(--accent-color);
+        color: #ffffff !important;
+        text-decoration: none;
+        border-radius: 15px;
+        text-align: center;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-detail:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--gold-glow); }
+
+    .watchlist-form-card {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 20;
+    }
+
+    .btn-quick-add {
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer;
+        font-size: 1.8rem;
+        color: #ffd700 !important;
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.8) !important;
+        transition: all 0.3s ease;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .btn-quick-add:hover { transform: scale(1.1); opacity: 0.7; }
+
+    .status-select-wrapper {
+        margin: 15px 0;
+        border-top: 1px solid;
+        border-image: linear-gradient(to right, transparent, rgba(212, 163, 115, 0.4), transparent) 1;
+        padding-top: 12px;
+    }
+
+    .status-select-wrapper label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(245, 245, 220, 0.6);
+        margin-bottom: 6px;
+    }
+
+    .status-select {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' fill='%23d4a373'><path d='M10 12l10 10 10-10z'/></svg>") no-repeat;
+        background-position: right 15px center;
+        background-size: 12px;
+        border: 1px solid rgba(212, 163, 115, 0.2);
+        border-radius: 12px;
+        color: #f5f5dc;
+        padding: 10px 35px 10px 15px;
+        outline: none;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.85rem;
+        transition: 0.3s;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .status-select:focus, .status-select:hover {
+        border-color: var(--accent-color);
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .sync-container {
+        text-align: center;
+        margin-top: 50px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .btn-sync {
+        padding: 14px 40px;
+        background: transparent;
+        border: 2px solid var(--accent-color);
+        color: var(--accent-color);
+        border-radius: 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-sync:hover {
+        background: var(--accent-color);
+        color: #050505;
+        box-shadow: 0 0 20px var(--gold-glow);
+    }
+</style>
+</head>
+<body>
+
+    <nav class="nav-menu">
+        <ul class="nav-list">
+            <li><a href="{% url 'anime:anime_list' %}" class="nav-link">Головна</a></li>
+            <li><a href="{% url 'profiles:my_list' %}" class="nav-link">Мій список</a></li>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profiles:profile_detail' user.profile.pk %}" class="nav-link">{{ user.profile.nickname|default:user.username|upper }}</a>
+                <li><a href="{% url 'logout' %}" class="nav-link">Вийти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}" class="nav-link">Увійти</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <h1>Мій Список Аніме</h1>
+
+    <div class="filter-container">
+        <button type="button" class="filter-btn active" data-filter="ALL">Усі</button>
+        <button type="button" class="filter-btn" data-filter="WATCHING">Дивлюся</button>
+        <button type="button" class="filter-btn" data-filter="PLANNING">В планах</button>
+        <button type="button" class="filter-btn" data-filter="COMPLETED">Переглянуто</button>
+        <button type="button" class="filter-btn" data-filter="DROPPED">Кинуто</button>
+    </div>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <ul class="anime-grid">
+            {% for item in anime_list %}
+                <li class="anime-card" data-current-status="{{ item.status }}" style="animation-delay: 0.{{ forloop.counter0 }}s;">
+
+                    {% if user.is_authenticated %}
+                        <div class="watchlist-form-card">
+                            <button type="button"
+                                    class="btn-quick-add ajax-star-btn"
+                                    data-url="{% url 'anime:toggle_watchlist' item.anime.pk %}"
+                                    title="Видалити зі списку">
+                                ★
+                            </button>
+                        </div>
+                    {% endif %}
+
+                    <strong class="anime-title">{{ item.anime.title }}</strong>
+                    <span style="opacity: 0.7;">{{ item.anime.release|date:"Y" }} рік</span>
+
+                    <div class="anime-meta">
+                        <div><strong>Тип:</strong> {{ item.anime.get_anime_type_display }}</div>
+                        {% if item.anime.anime_type == 'MOVIE' %}
+                            <div><strong>Фільмів:</strong> {{ item.anime.movies_count|default:"1" }}</div>
+                        {% else %}
+                            <div><strong>Серій:</strong> {{ item.anime.episodes }}</div>
+                        {% endif %}
+                        <div><strong>Автор:</strong>
+                            {% for author in item.anime.authors.all %}
+                                {{ author.name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %} Не вказано {% endfor %}
+                        </div>
+                    </div>
+
+                    <p class="rating">★ {{ item.anime.rating|default:"0.0" }} / 10</p>
+                    <p style="font-size: 0.9em; opacity: 0.9; margin-bottom: 15px;">
+                        {{ item.anime.description|truncatewords:12 }}
+                    </p>
+
+                    <div class="status-select-wrapper">
+                        <label>Статус перегляду</label>
+                        <select name="status_{{ item.id }}" class="status-select js-status-select">
+                            <option value="WATCHING" {% if item.status == 'WATCHING' %}selected{% endif %}>Дивлюся</option>
+                            <option value="PLANNING" {% if item.status == 'PLANNING' %}selected{% endif %}>В планах</option>
+                            <option value="COMPLETED" {% if item.status == 'COMPLETED' %}selected{% endif %}>Переглянуто</option>
+                            <option value="DROPPED" {% if item.status == 'DROPPED' %}selected{% endif %}>Кинуто</option>
+                        </select>
+                    </div>
+
+                    <a href="{% url 'anime:anime_detail' item.anime.pk %}" class="btn-detail">Детальніше</a>
+                </li>
+            {% empty %}
+                <li id="empty-message" style="grid-column: 1/-1; text-align: center; padding: 80px 20px; opacity: 1;">
+                    <p style="font-size: 1.5em; opacity: 0.5;">Цей список порожній..</p>
+                </li>
+            {% endfor %}
+
+            <li id="js-empty-message" style="grid-column: 1/-1; text-align: center; padding: 80px 20px; display: none;">
+                <p style="font-size: 1.5em; opacity: 0.5;">У цій папці поки порожньо..</p>
+            </li>
+        </ul>
+
+        {% if anime_list %}
+            <div class="sync-container">
+                <button type="submit" class="btn-sync">Зберегти</button>
+            </div>
+        {% endif %}
+    </form>
+
+<script>
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const animeCards = document.querySelectorAll('.anime-card');
+    const jsEmptyMessage = document.getElementById('js-empty-message');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const targetStatus = this.getAttribute('data-filter');
+            let visibleCardsCount = 0;
+
+            animeCards.forEach(card => {
+                const cardStatus = card.getAttribute('data-current-status');
+
+                if (targetStatus === 'ALL' || cardStatus === targetStatus) {
+                    card.style.display = 'flex';
+                    visibleCardsCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCardsCount === 0 && animeCards.length > 0) {
+                jsEmptyMessage.style.display = 'block';
+            } else {
+                jsEmptyMessage.style.display = 'none';
+            }
+        });
+    });
+
+    document.querySelectorAll('.js-status-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const card = this.closest('.anime-card');
+            if (card) { card.setAttribute('data-current-status', this.value); }
+        });
+    });
+
+    document.querySelectorAll('.ajax-star-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            let button = this;
+            let card = button.closest('.anime-card');
+            let url = button.getAttribute('data-url');
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            }).then(response => {
+                if(response.ok) {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px) scale(0.9)';
+                    setTimeout(() => {
+                        card.remove();
+                        const activeBtn = document.querySelector('.filter-btn.active');
+                        if (activeBtn) activeBtn.click();
+                    }, 500);
+                }
+            }).catch(error => console.error('Помилка:', error));
+        });
+    });
+</script>
+</body>
+</html>
