@@ -4,7 +4,9 @@ from django.contrib.auth import login as auth_login
 from .models import Profile, UserAnime
 from .forms import CustomUserCreationForm
 from django.db.models import Sum
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 def profile_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
