@@ -1,124 +1,9 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <title>Watch Note</title>
+{% extends 'base.html' %}
+
+{% block title %}Головна | Watch Note{% endblock %}
+
+{% block content %}
 <style>
-    :root {
-        --accent-color: #d4a373;
-        --gold-glow: rgba(212, 163, 115, 0.4);
-        --glass-bg: rgba(245, 245, 220, 0.15);
-        --glass-hover: rgba(245, 245, 220, 0.25);
-    }
-
-    body {
-        margin: 0;
-        padding: 120px 20px 40px;
-        color: #ffffff;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #1a1a2e;
-        min-height: 100vh;
-        overflow-x: hidden;
-        position: relative;
-    }
-
-    body::before {
-        content: "";
-        position: fixed;
-        top: 50px;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('https://i.pinimg.com/736x/ac/3b/46/ac3b465eba3206321fa1a2dc49c08fff.jpg');
-        background-size: contain;
-        background-position: center;
-        background-repeat: no-repeat;
-        transform: rotate(270deg) scale(2.2);
-        transform-origin: center;
-        z-index: -1;
-        pointer-events: none;
-        filter: brightness(0.5);
-    }
-
-
-    .nav-menu {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: var(--glass-bg);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border-bottom: 1px solid rgba(245, 245, 220, 0.2);
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        padding: 15px 0;
-    }
-
-    .nav-list {
-        display: flex;
-        gap: 25px;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        align-items: center;
-    }
-
-    .nav-link {
-        color: #f5f5dc;
-        text-decoration: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: 0.85em;
-        transition: 0.3s;
-        padding: 10px 20px;
-        border-radius: 12px;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-
-    .nav-link:hover {
-        background: var(--glass-hover);
-        text-shadow: 0 0 10px rgba(245, 245, 220, 0.5);
-        transform: translateY(-2px);
-    }
-
-
-    .search-container {
-        display: flex;
-        align-items: center;
-    }
-
-    .search-input-wrapper {
-        width: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-        display: flex;
-        align-items: center;
-    }
-
-
-    .search-input-wrapper.active {
-        width: 220px;
-        opacity: 1;
-        margin-left: 10px;
-    }
-
-    .search-input {
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid var(--accent-color);
-        border-radius: 20px;
-        padding: 6px 15px;
-        color: #f5f5dc;
-        outline: none;
-        width: 150px;
-        font-size: 0.9em;
-    }
-
     h1 {
         position: relative;
         z-index: 10;
@@ -127,6 +12,7 @@
         letter-spacing: 6px;
         text-shadow: 0 5px 15px rgba(0,0,0,0.5);
         margin-bottom: 50px;
+        color: #fff;
     }
 
     .anime-grid {
@@ -139,7 +25,6 @@
         z-index: 10;
     }
 
-
     .anime-card {
         background: rgba(245, 245, 220, 0.12);
         backdrop-filter: blur(10px);
@@ -151,30 +36,19 @@
         display: flex;
         flex-direction: column;
         height: 100%;
-
-
+        box-sizing: border-box;
         opacity: 0;
         animation: widgetRise 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-
-
         transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                     box-shadow 0.4s ease,
                     border-color 0.4s ease,
                     background 0.4s ease;
     }
 
-
     @keyframes widgetRise {
         0% { opacity: 0; transform: translateY(40px) scale(0.95); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-
-    .anime-card:nth-child(1) { animation-delay: 0.1s; }
-    .anime-card:nth-child(2) { animation-delay: 0.2s; }
-    .anime-card:nth-child(3) { animation-delay: 0.3s; }
-    .anime-card:nth-child(4) { animation-delay: 0.4s; }
-    .anime-card:nth-child(5) { animation-delay: 0.5s; }
-    .anime-card:nth-child(6) { animation-delay: 0.6s; }
 
     .anime-card:hover {
         transform: translateY(-15px) scale(1.02);
@@ -202,7 +76,6 @@
 
     .btn-detail:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--gold-glow); }
 
-
     .watchlist-form-card {
         position: absolute;
         top: 12px;
@@ -224,148 +97,83 @@
         line-height: 1;
     }
 
-
     .btn-quick-add.active {
         color: #ffd700 !important;
         text-shadow: 0 0 15px rgba(255, 215, 0, 0.8) !important;
     }
-
-    .btn-quick-add:hover {
-        transform: scale(1.1);
-        color: rgba(255, 215, 0, 0.5) !important;
-    }
-
-    .btn-quick-add.active:hover {
-        color: #ffea00 !important;
-    }
 </style>
-</head>
-<body>
 
-    <nav class="nav-menu">
-        <ul class="nav-list">
-            <li><a href="{% url 'anime:anime_list' %}" class="nav-link">Головна</a></li>
-       <li><a href="{% url 'profiles:my_list' %}" class="nav-link">Мій список</a></li>
+<h1>{{ page_title|default:"Охайоо, тайм-аут?" }}</h1>
 
-            <li class="search-container">
-                <button id="search-trigger" class="nav-link">Пошук</button>
-
-                <div id="search-wrapper" class="search-input-wrapper {% if search_query %}active{% endif %}">
-                    <form action="{% url 'anime:anime_list' %}" method="get" style="display: flex; gap: 8px;">
-                        <input type="text" name="q" placeholder="Введіть назву..."
-                               value="{{ search_query|default:'' }}" class="search-input">
-                        <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.2em;"></button>
-                    </form>
-                </div>
-            </li>
-
-           {% if user.is_authenticated %}
-            <li><a href="{% url 'profiles:profile_detail' user.profile.pk %}" class="nav-link">Профіль ({{ user.username }})</a></li>
-
-            <li>
-                <form action="{% url 'logout' %}" method="post" style="display:inline; margin: 0;">
-                    {% csrf_token %}
-                    <button type="submit" class="nav-link" style="color: var(--accent-color); padding-left: 0;">Вийти</button>
-                </form>
-            </li>
-        {% else %}
-            <li><a href="{% url 'login' %}" class="nav-link">Увійти</a></li>
-            <li><a href="#" class="nav-link" style="color: var(--accent-color);">Реєстрація</a></li>
-        {% endif %} </ul>
-    </nav>
-
-    <h1>{{ page_title|default:"Охайоо, тайм-аут?" }}</h1>
-
-    {% if search_query %}
-        <div style="text-align: center; margin-bottom: 30px; animation: widgetRise 0.5s;">
-            <span style="color: var(--accent-color); font-size: 1.2em;">Знайдено за вашим запитом: "{{ search_query }}"</span>
-            <br>
-            <a href="{% url 'anime:anime_list' %}" style="color: #fff; opacity: 0.5; font-size: 0.9em; text-decoration: underline;">Скинути фільтр</a>
-        </div>
-    {% endif %}
-
-    <ul class="anime-grid">
-        {% for anime in object_list %}
-            <li class="anime-card">
-
-{% if user.is_authenticated %}
-    <form action="{% url 'profiles:toggle_watchlist' anime.pk %}" method="post" class="watchlist-form-card ajax-star-form">
-        {% csrf_token %}
-        <button type="submit" class="btn-quick-add {% if anime in user.profile.watchlist.all %}active{% endif %}" title="{% if anime in user.profile.watchlist.all %}Видалити зі списку{% else %}Додати в список{% endif %}">
-            ★
-        </button>
-    </form>
+{% if search_query %}
+    <div style="text-align: center; margin-bottom: 30px;">
+        <span style="color: var(--accent-color); font-size: 1.2em;">Знайдено за вашим запитом: "{{ search_query }}"</span>
+        <br>
+        <a href="{% url 'anime:anime_list' %}" style="color: #fff; opacity: 0.5; font-size: 0.9em; text-decoration: underline;">Скинути фільтр</a>
+    </div>
 {% endif %}
 
-<strong class="anime-title">{{ anime.title }}</strong>
-<span style="opacity: 0.7;">{{ anime.release|date:"Y" }} рік</span>
+<ul class="anime-grid">
+    {% for anime in object_list %}
+        <li class="anime-card" style="animation-delay: 0.{{ forloop.counter0 }}s;">
 
-<div class="anime-meta">
-    <div><strong>Тип:</strong> {{ anime.get_anime_type_display }}</div>
-    <div><strong>Серій:</strong> {{ anime.episodes }}</div>
-    <div><strong>Автор:</strong>
-        {% for author in anime.authors.all %}
-            {{ author.name }}{% if not forloop.last %}, {% endif %}
-        {% empty %}
-            Не вказано
-        {% endfor %}
-    </div>
-</div>
-                <p class="rating">★ {{ anime.rating|default:"0.0" }} / 10</p>
-                <p style="font-size: 0.9em; opacity: 0.9; margin-bottom: 20px;">
-                    {{ anime.description|truncatewords:12 }}
-                </p>
+            {% if user.is_authenticated %}
+                <form action="{% url 'anime:toggle_watchlist' anime.pk %}" method="post" class="watchlist-form-card ajax-star-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-quick-add {% if anime.id in user_watchlist_ids %}active{% endif %}" title="Зберегти">
+                        ★
+                    </button>
+                </form>
+            {% endif %}
 
-                <a href="{% url 'anime:anime_detail' anime.pk %}" class="btn-detail">Детальніше</a>
-            </li>
-        {% empty %}
-            <li style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0; animation: widgetRise 0.5s forwards;">
-                <p style="font-size: 1.5em; opacity: 0.5;">Ой, ми нічого не знайшли.. </p>
-            </li>
-        {% endfor %}
-    </ul>
+            <strong class="anime-title">{{ anime.title }}</strong>
+            <span style="opacity: 0.7;">{{ anime.release|date:"Y" }} рік</span>
+
+            <div class="anime-meta">
+                <div><strong>Тип:</strong> {{ anime.get_anime_type_display }}</div>
+                {% if anime.anime_type == 'MOVIE' %}
+                    <div><strong>Фільмів:</strong> {{ anime.movies_count|default:"1" }}</div>
+                {% else %}
+                    <div><strong>Серій:</strong> {{ anime.episodes }}</div>
+                {% endif %}
+                <div><strong>Автор:</strong>
+                    {% for author in anime.authors.all %}
+                        {{ author.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %} Не вказано {% endfor %}
+                </div>
+            </div>
+            
+            <p class="rating">★ {{ anime.rating|default:"0.0" }} / 10</p>
+            <p style="font-size: 0.9em; opacity: 0.9; margin-bottom: 20px;">
+                {{ anime.description|truncatewords:12 }}
+            </p>
+
+            <a href="{% url 'anime:anime_detail' anime.pk %}" class="btn-detail">Детальніше</a>
+        </li>
+    {% empty %}
+        <li style="grid-column: 1/-1; text-align: center; padding: 50px; opacity: 0; animation: widgetRise 0.5s forwards;">
+            <p style="font-size: 1.5em; opacity: 0.5;">Ой, ми нічого не знайшли.. </p>
+        </li>
+    {% endfor %}
+</ul>
 
 <script>
-        const trigger = document.getElementById('search-trigger');
-        const wrapper = document.getElementById('search-wrapper');
-        const input = wrapper.querySelector('input');
-
-        trigger.addEventListener('click', (e) => {
+    // Красивый AJAX для моментального переключения звёздочек без перезагрузки
+    document.querySelectorAll('.ajax-star-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
-            wrapper.classList.toggle('active');
+            let btn = this.querySelector('.btn-quick-add');
+            let url = this.action;
+            let formData = new FormData(this);
 
-            if (wrapper.classList.contains('active')) {
-                input.focus();
-            }
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(response => {
+                if(response.ok) { btn.classList.toggle('active'); }
+            }).catch(error => console.error('Помилка:', error));
         });
-
-
-        // Магія для зірочки
-        document.querySelectorAll('.ajax-star-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Зупиняємо стрибок сторінки
-
-                let btn = this.querySelector('.btn-quick-add');
-                let url = this.action;
-                let formData = new FormData(this);
-
-                fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                }).then(response => {
-                    if(response.ok) {
-                        btn.classList.toggle('active'); // Вмикаємо/вимикаємо золото
-                    }
-                }).catch(error => console.error('Помилка:', error));
-            });
-        });
-    </script>
-
-
-
-
-</body>
-</html>
+    });
+</script>
+{% endblock %}

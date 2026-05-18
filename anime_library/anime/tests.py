@@ -8,5 +8,3 @@ class AnimeModelTest(TestCase):
         def test_string_representation(self):
             anime = Anime.objects.get(id=1)
             self.assertEqual(str(anime), "Чорна конюшина")
-# Create your tests here.
-#python manage.py test

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ character.name }} - Watch Note</title>
+    <style>
+        :root {
+            --accent-color: #d4a373; /* Золото */
+            --bg-dark: #050505;
+            --glass-bg: rgba(15, 15, 15, 0.85);
+            --glow-color: rgba(212, 163, 115, 0.5);
+            --text-main: #f5f5dc;
+            --text-dim: #999999;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            /* Глибокий містичний фон */
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(40, 30, 60, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(30, 20, 10, 0.3) 0%, transparent 40%),
+                #050505;
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* ОСНОВНИЙ КОНТЕЙНЕР (ЯК НА СКРІНІ) */
+        .character-card {
+            position: relative;
+            max-width: 1000px;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+
+            /* Тонка золота рама контейнера */
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(212, 163, 115, 0.1);
+            border-radius: 15px;
+
+            padding: 60px;
+            display: flex;
+            gap: 60px;
+            align-items: center;
+            animation: cardFadeIn 1s ease-out forwards;
+        }
+
+        @keyframes cardFadeIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ВЕЛИКІ ЗІРКИ ПО КУТАХ КАРТКИ */
+        .card-star {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4a373'%3E%3Cpath d='M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px var(--glow-color));
+        }
+        .star-tl { top: -15px; left: -15px; }
+        .star-tr { top: -15px; right: -15px; }
+        .star-bl { bottom: -15px; left: -15px; }
+        .star-br { bottom: -15px; right: -15px; }
+
+        /* ЕЛЕГАНТНА ФІГУРНА РАМКА ДЛЯ ФОТО З ПІДСВІТКОЮ */
+        .photo-image-wrapper {
+            flex: 0 0 auto;
+            position: relative;
+            padding: 20px; /* Місце для фігурної рамки */
+        }
+
+        /* Тонка фігурна золота філігрань (SVG) */
+        .photo-image-wrapper::before,
+        .photo-image-wrapper::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            z-index: 10;
+            filter: drop-shadow(0 0 5px var(--glow-color));
+        }
+        /* Філігрань по кутах */
+        .photo-image-wrapper::before {
+            top: -10px; right: -10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10 10 C 20 10, 30 20, 30 30 C 30 40, 20 50, 10 50 M10 10 C 10 20, 20 30, 30 30 C 40 30, 50 20, 50 10' stroke='%23d4a373' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+        }
+        .photo-image-wrapper::after {
+            bottom: -10px; left: -10px;
+            transform: rotate(180deg);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10 10 C 20 10, 30 20, 30 30 C 30 40, 20 50, 10 50 M10 10 C 10 20, 20 30, 30 30 C 40 30, 50 20, 50 10' stroke='%23d4a373' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+        }
+
+        .photo-inner-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+
+            box-shadow: 0 0 35px var(--glow-color), inset 0 0 20px var(--glow-color);
+            transition: 0.5s ease;
+        }
+
+        .photo-inner-wrapper:hover {
+            box-shadow: 0 0 50px var(--accent-color);
+            transform: scale(1.03);
+        }
+
+        .char-img {
+            display: block;
+            width: 320px;
+            height: auto;
+            max-height: 450px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--accent-color);
+        }
+
+        /* ІНФОРМАЦІЙНИЙ БЛОК */
+        .info-section {
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 20px var(--glow-color);
+            text-transform: none;
+            letter-spacing: -2px;
+        }
+
+        .char-role {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            text-transform: lowercase;
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+
+        .meta-list {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 1.1rem;
+            text-transform: lowercase;
+        }
+
+        .meta-list strong {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+
+        .family-tag {
+            color: #fff;
+            text-decoration: none;
+            background: rgba(212, 163, 115, 0.2);
+            padding: 3px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 10px var(--glow-color);
+            text-transform: capitalize;
+            margin-right: 5px;
+            transition: 0.3s;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .family-tag:hover {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .description {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            text-transform: lowercase;
+            max-height: 150px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        /* КНОПКИ ВНИЗУ ПРАВОРУЧ */
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: 1px solid var(--accent-color);
+            background: transparent;
+            color: var(--accent-color);
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 0.9rem;
+            text-transform: lowercase;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .btn:hover {
+            background: rgba(212, 163, 115, 0.1);
+            box-shadow: 0 0 20px var(--glow-color);
+            transform: translateY(-2px);
+        }
+
+        /* Декор під кнопками */
+        .btn::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 80%;
+            height: 1px;
+            background: var(--accent-color);
+            transform: translateX(-50%);
+            opacity: 0.5;
+        }
+
+        @media (max-width: 900px) {
+            .character-card { flex-direction: column; text-align: center; padding: 40px; }
+            .btn-group { justify-content: center; }
+            .char-img { width: 100%; max-width: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="character-card">
+        <div class="card-star star-tl"></div>
+        <div class="card-star star-tr"></div>
+        <div class="card-star star-bl"></div>
+        <div class="card-star star-br"></div>
+
+        <div class="photo-image-wrapper">
+            <div class="photo-inner-wrapper">
+                {% if character.photo %}
+                    <img src="{{ character.photo.url }}" alt="{{ character.name }}" class="char-img">
+                {% else %}
+                    <div class="char-img" style="display: flex; align-items: center; justify-content: center; background: #111; height: 350px;">?</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h1>{{ character.name }}</h1>
+            <div class="char-role">{{ character.role }}</div>
+
+            <div class="meta-list">
+                {% if character.birthday %}
+                    <div class="meta-item">
+                        <strong>день народження:</strong> {{ character.birthday|date:"d E" }}
+                    </div>
+                {% endif %}
+
+                {% if character.age %}
+                    <div class="meta-item">
+                        <strong>вік:</strong> {{ character.age }} років
+                    </div>
+                {% endif %}
+
+                {% if character.family.all %}
+                    <div class="meta-item">
+                        <strong>сім'я:</strong>
+                        {% for relative in character.family.all %}
+                            <a href="{% url 'characters:character_detail' relative.pk %}" class="family-tag">{{ relative.name }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="description">
+                {% if character.description %}
+                    {{ character.description|linebreaks }}
+                {% else %}
+                    історія цього персонажа поки що прихована за печатками магії..
+                {% endif %}
+            </div>
+
+            <div class="btn-group">
+                <button onclick="history.back()" class="btn">← назад</button>
+                {% if character.anime %}
+                    <a href="{% url 'anime:anime_detail' character.anime.pk %}" class="btn">
+                        до {{ character.anime.title }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

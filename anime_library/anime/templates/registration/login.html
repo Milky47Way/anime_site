@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Вхід - Watch Note</title>
+    <title>Вхід</title>
     <style>
         body {
             margin: 0;
@@ -16,7 +16,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-
         body::before {
             content: "";
             position: fixed;
@@ -24,11 +23,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://i.pinimg.com/736x/db/90/97/db9097ead8d89acb01d02744fa6d9350.jpg');
+
+            background-image: url('https://i.pinimg.com/1200x/e1/41/6c/e1416c604ed8c77a485a1b18b2f8d1fa.jpg');
             background-size: cover;
             background-position: center;
             z-index: -1;
-            filter: brightness(0.4);
+            filter: brightness(0.35) saturate(1.1);
         }
 
         .login-card {
@@ -49,6 +49,18 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             margin-bottom: 30px;
+        }
+
+        .error-block {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            text-align: left;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
         }
 
         .form-group {
@@ -124,11 +136,19 @@
 
     <div class="login-card">
         <h2>Вхід</h2>
-        <form method="post">
+
+        {% if form.errors %}
+            <div class="error-block">
+                <strong>Помилка входу!</strong><br>
+                Невірне ім'я користувача або пароль. Спробуй ще раз!
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
 
             <div class="form-group">
-                <label for="id_username">Ім'я користувача</label>
+                <label for="id_username">Ім'я користувача або пошта</label>
                 <input type="text" name="username" id="id_username" required>
             </div>
 
@@ -140,7 +160,11 @@
             <button type="submit" class="btn-login">Увійти</button>
         </form>
 
-        <a href="{% url 'anime:anime_list' %}" class="back-link">← На головну</a>
+        <a href="{% url 'profiles:register' %}" class="back-link" style="display: block; margin-top: 15px; margin-bottom: -10px;">Немає акаунту? Зареєструватися</a>
+
+        <a href="{% url 'profiles:password_reset' %}" class="back-link" style="display: block; margin-top: 15px; margin-bottom: -10px;">Забули пароль?</a>
+
+        <a href="{% url 'anime:anime_list' %}" class="back-link">На головну</a>
     </div>
 
 </body>

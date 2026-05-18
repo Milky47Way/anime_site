@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ anime.title }} - інформація </title>
+{% extends 'base.html' %}
+
+{% block title %}{{ anime.title }} - інформація | Watch Note{% endblock %}
+
+{% block content %}
 <style>
     :root {
         --accent-color: #d4af37;
@@ -10,17 +10,6 @@
         --card-bg: #1f1f1f;
         --text-main: #f5f5dc;
         --text-dim: #e5e5e5;
-    }
-
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--bg-dark);
-        background-image: radial-gradient(circle at top right, #1a1a1a, #141414);
-        color: var(--text-main);
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        min-height: 100vh;
-        -webkit-font-smoothing: antialiased;
     }
 
     .anime-container {
@@ -36,7 +25,6 @@
         border: 1px solid rgba(212, 175, 55, 0.1);
     }
 
-    /* Сетка для хедера: текст слева, постер справа */
     .anime-header {
         display: flex;
         flex-wrap: wrap;
@@ -88,17 +76,11 @@
     }
 
     p, li {
-        font-size: 1.05rem;
-        line-height: 1.7;
-        color: var(--text-dim);
+        font-size: 1.05rem; line-height: 1.7; color: var(--text-dim);
     }
 
     .genre-list {
-        list-style: none;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px;
     }
 
     .genre-list li {
@@ -161,6 +143,8 @@
         padding: 25px;
         margin-bottom: 20px;
         transition: 0.3s;
+        position: relative;
+        cursor: pointer;
     }
 
     .review-box:hover {
@@ -168,167 +152,383 @@
         transform: translateY(-2px);
     }
 
-    .back-link {
+    .user-avatar {
+        width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent-color);
+    }
+
+    .action-menu {
+        display: none;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #1a1a1a;
+        border: 1px solid var(--accent-color);
+        border-radius: 8px;
+        z-index: 100;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        overflow: hidden;
+    }
+
+    .action-menu a {
         display: block;
-        text-align: center;
-        margin-top: 50px;
-        opacity: 0.6;
-        font-size: 0.9rem;
-    }
-
-    a {
-        color: var(--accent-color);
+        padding: 10px 20px;
+        color: var(--text-main);
         text-decoration: none;
-        transition: 0.3s;
+        font-size: 0.85rem;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
     }
 
-    a:hover {
+    .action-menu a:hover { background: var(--accent-color); color: #000; }
+    .show-menu { display: block !important; }
+
+    .inline-edit-form textarea {
+        width: 100%;
+        background: #0a0a0a;
+        border: 1px solid var(--accent-color);
         color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-family: inherit;
     }
 
-    .anime-extra-info {
-        margin-top: 15px;
-        font-size: 1rem;
+    .btn-small {
+        padding: 5px 15px;
+        background: var(--accent-color);
+        color: #000;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
     }
+
+    .back-link {
+        display: block; text-align: center; margin-top: 50px; opacity: 0.6; font-size: 0.9rem;
+    }
+
+    a { color: var(--accent-color); text-decoration: none; transition: 0.3s; }
+    a:hover { color: #fff; }
 
     @media (max-width: 768px) {
-        .anime-header {
-            flex-direction: column-reverse;
-            text-align: center;
-        }
-        .anime-poster-wrapper {
-            margin: 0 auto;
-        }
+        .anime-header { flex-direction: column-reverse; text-align: center; }
+        .anime-poster-wrapper { margin: 0 auto; }
         h1 { font-size: 2.5rem; }
-        h3 { border-left: none; padding-left: 0; }
-        .genre-list { justify-content: center; }
     }
 </style>
-</head>
-<body>
 
-    <div class="anime-container">
-        <div class="anime-header">
-            <div class="anime-info-main">
-                <h1>{{ anime.title }}</h1>
+<div class="anime-container">
+    <div class="anime-header">
+        <div class="anime-info-main">
+            <h1>{{ anime.title }}</h1>
+            <p><span class="rating-badge">{{ anime.rating|default:"0.0" }}/10 ★</span>
+               <strong>Дата релізу:</strong> {{ anime.release|date:"Y" }}</p>
 
-                <p><span class="rating-badge">{{ anime.rating }}/10 ★</span>
-                   <strong>Дата релізу:</strong> {{ anime.release|date:"Y" }}</p>
+         <div class="anime-extra-info">
+    {% if anime.age_rating %}
+        <p><strong>Віковий рейтинг:</strong> {{ anime.age_rating }}</p>
+    {% endif %}
 
-                <div class="anime-extra-info">
-                    <p><strong>Тип:</strong> {{ anime.get_anime_type_display }}</p>
+    <p><strong>Тип:</strong> {{ anime.get_anime_type_display }}</p>
 
-                    {% if anime.anime_type == 'MOVIE' %}
-                        <p><strong style="color: #fff;">Фільмів:</strong> {{ anime.movies_count|default:"1" }}</p>
-                    {% else %}
-                        <p><strong>Кількість серій:</strong> {{ anime.episodes }}</p>
-                        {% if anime.movies_count > 0 %}
-                            <p><strong style="color: #fff;">Додаткові фільми:</strong> {{ anime.movies_count }}</p>
-                        {% endif %}
-                    {% endif %}
+    {% if anime.anime_type == 'MOVIE' %}
+        <p><strong style="color: #fff;">Фільмів:</strong> {{ anime.movies_count|default:"1" }}</p>
+    {% else %}
+        <p><strong>Кількість серій:</strong> {{ anime.episodes }}</p>
+        {% if anime.movies_count %}
+            <p><strong>Кількість фільмів:</strong> {{ anime.movies_count }}</p>
+        {% endif %}
+    {% endif %}
 
-                    <p><strong>Автор:</strong>
-                        {% for author in anime.authors.all %}
-                            {{ author.name }}{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            Не вказано
-                        {% endfor %}
-                    </p>
-                </div>
+    {% if anime.ova_count %}
+        <p><strong>Кількість OVA:</strong> {{ anime.ova_count }}</p>
+    {% endif %}
 
-              <h3>Жанри</h3>
-<ul class="genre-list">
-    {% for genre in anime.genres.all %}
-        <li>
-            <a href="{% url 'anime:anime_by_genre' genre.id %}"
-               style="color: inherit; text-decoration: none; display: block; width: 100%; height: 100%;">
-                {{ genre.name }}
-            </a>
-        </li>
-    {% endfor %}
-</ul>
+    <p><strong>Автор:</strong>
+        {% for author in anime.authors.all %}
+            {{ author.name }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            Не вказано
+        {% endfor %}
+    </p>
+</div>
+            <h3>Жанри</h3>
+            <ul class="genre-list">
+                {% for genre in anime.genres.all %}
+                    <li><a href="{% url 'anime:anime_by_genre' genre.id %}" style="color: inherit;">{{ genre.name }}</a></li>
+                {% endfor %}
+            </ul>
 
-                {% if anime.trailer_url %}
-                    <a href="{{ anime.trailer_url }}" target="_blank" class="trailer-btn">Дивитися трейлер</a>
-                {% endif %}
-            </div>
-
-            {% if anime.poster %}
-            <div class="anime-poster-wrapper">
-                <img src="{{ anime.poster.url }}" alt="{{ anime.title }}" class="poster-img">
-            </div>
+            {% if anime.trailer_url %}
+                <a href="{{ anime.trailer_url }}" target="_blank" class="trailer-btn">Дивитися трейлер</a>
             {% endif %}
         </div>
 
-        <h3>Опис</h3>
-        <p>{{ anime.description }}</p>
+        {% if anime.poster %}
+        <div class="anime-poster-wrapper">
+            <img src="{{ anime.poster.url }}" alt="{{ anime.title }}" class="poster-img">
+        </div>
+        {% endif %}
+    </div>
 
-        <hr>
+    <h3>Опис</h3>
+    <p>{{ anime.description }}</p>
 
-   <h3>Персонажі</h3>
-        <ul style="list-style: none; padding: 0;">
-            {% for character in characters %}
-                <li style="margin-bottom: 12px;">
-                    <strong style="color: #f9d71c;">
-                        <a href="{% url 'characters:character_detail' character.pk %}" class="character-link">
-                            {{ character.name }}
-                        </a>
-                    </strong>
-        <span style="color: #fff; opacity: 1; margin-left: 10px;">- {{ character.role }}</span>
+    {% if anime.related_anime.all %}
+        <h3>Пов'язані тайтли</h3>
+        <ul style="list-style: none; padding: 0; margin-bottom: 25px;">
+            {% for related in anime.related_anime.all %}
+                <li style="margin-bottom: 10px; padding-left: 8px; border-left: 2px solid var(--accent-color, #d4af37); transition: all 0.3s ease;">
+                    ⭐ <a href="{% url 'anime:anime_detail' related.pk %}" style="font-weight: bold; text-decoration: none; color: #f5f5dc;">
+                        {{ related.title }}
+                    </a>
                 </li>
-            {% empty %}
-                <li>Герої ще не додані до цього аніме</li>
             {% endfor %}
         </ul>
+    {% endif %}
 
-        <hr>
+  <hr>
+    <h3>Персонажі</h3>
+    <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
+        {% for character in characters|dictsort:"name" %}
+            <li class="{% if forloop.counter > 3 %}hidden-char-item{% endif %}"
+                style="margin-bottom: 12px; padding-left: 8px; border-left: 2px solid rgba(249, 215, 28, 0.4); transition: all 0.3s ease;">
+                <strong style="color: #f9d71c;">
+                    <a href="{% url 'characters:character_detail' character.pk %}" style="color: inherit; text-decoration: none;">{{ character.name }}</a>
+                </strong>
+                <span style="color: #fff;">- {{ character.role }}</span>
+            </li>
+        {% endfor %}
+    </ul>
 
-<h3>Відгуки глядачів</h3>
+    {% if characters|length > 3 %}
+        <div style="margin-bottom: 25px;">
+            <button id="toggle-chars-btn" style="background: transparent; border: 1px solid var(--accent-color, #d4af37); color: var(--accent-color, #d4af37); padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85em; transition: 0.3s; outline: none;">
+                Показати всіх персонажів ({{ characters|length }})
+            </button>
+        </div>
+    {% endif %}
 
-        {% if user.is_authenticated %}
-            <div class="review-box" style="border: 1px dashed var(--accent-color); background: rgba(212, 175, 55, 0.05); margin-bottom: 40px;">
-             <h4 style="margin-top: 0; color: var(--accent-color); letter-spacing: 1px;">
-    Поділіться враженнями, {{ user.username|default:"Гість" }}
-</h4>
+    <style>
+        .hidden-char-item {
+            display: none !important;
+        }
+        #toggle-chars-btn:hover {
+            background: var(--accent-color, #d4af37);
+            color: #141414;
+        }
+    </style>
 
-                <form method="post" action="{% url 'anime:add_review' anime.pk %}">
-                    {% csrf_token %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const charBtn = document.getElementById('toggle-chars-btn');
+            if (!charBtn) return;
 
-                    <div style="display: flex; gap: 20px; margin-bottom: 15px; align-items: center;">
-                        <label style="opacity: 0.8;">Твоя оцінка:</label>
-                        <input type="number" name="rating" min="1" max="10" value="10" required
-                               style="background: #141414; border: 1px solid var(--accent-color); color: #fff; padding: 5px 10px; border-radius: 5px; width: 50px;">
-                        <span style="color: var(--accent-color);">★ / 10</span>
-                    </div>
+            const hiddenItems = document.querySelectorAll('.hidden-char-item');
+            let isOpen = false;
 
-                    <textarea name="text" placeholder="Тут щось цікаве.." required
-                              style="width: 100%; background: #141414; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 15px; min-height: 100px; font-family: inherit; margin-bottom: 15px; box-sizing: border-box;"></textarea>
+            charBtn.addEventListener('click', function() {
+                isOpen = !isOpen;
+                hiddenItems.forEach(item => {
+                    item.style.setProperty('display', isOpen ? 'list-item' : 'none', 'important');
+                });
+                charBtn.textContent = isOpen ? 'Сховати додаткових' : 'Показати всіх персонажів ({{ characters|length }})';
+            });
+        });
+    </script>
 
-                    <button type="submit" class="trailer-btn" style="width: 100%; cursor: pointer; padding: 10px;">
-                        Опублікувати відгук
-                    </button>
-                </form>
+    <hr>
+    <h3>Відгуки глядачів</h3>
+
+    {% if user.is_authenticated %}
+        <div id="review-form-anchor" class="review-box" style="border: 1px dashed var(--accent-color); background: rgba(212, 175, 55, 0.05); margin-bottom: 40px;">
+            <div id="reply-info-banner" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(212, 175, 55, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.2);">
+                <span style="font-size: 0.9rem; color: var(--text-main);">Ви відповідаєте користувачу: <strong id="reply-target-user" style="color: var(--accent-color);"></strong></span>
+                <button type="button" onclick="cancelReplyMagic()" style="background: transparent; border: none; color: #ff4444; cursor: pointer; font-weight: bold;">✕ Скасувати</button>
             </div>
-        {% else %}
-            <p style="text-align: center; opacity: 0.6; margin-bottom: 30px;">
-                <a href="{% url 'login' %}" style="color: var(--accent-color);">Увійди</a>, щоб залишити відгук.
-            </p>
-{% endif %}
+
+            <form method="post" action="{% url 'anime:add_review' anime.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" id="parent-id-input" value="">
+
+                <div id="rating-form-group" style="display: flex; gap: 20px; margin-bottom: 15px; align-items: center;">
+                    <label>Твоя оцінка:</label>
+                    <input type="number" name="rating" min="1" max="10" value="10" required
+                           style="background: #141414; border: 1px solid var(--accent-color); color: #fff; padding: 5px 10px; border-radius: 5px; width: 50px;">
+                </div>
+                <textarea name="text" id="review-textarea" placeholder="Тут щось цікаве.." required
+                          style="width: 100%; background: #141414; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 15px; min-height: 100px; font-family: inherit; margin-bottom: 15px; box-sizing: border-box;"></textarea>
+                <button type="submit" id="submit-review-btn" class="trailer-btn" style="width: 100%;">Опублікувати відгук</button>
+            </form>
+        </div>
+    {% endif %}
 
     {% for review in reviews %}
-        <div class="review-box">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <strong style="color: var(--accent-color);">{{ review.user.username }}</strong>
-                <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10 ★</span>
+        <div class="review-box" id="review-display-{{ review.id }}" onclick="toggleReviewMenu(event, 'menu-{{ review.id }}')">
+            <div id="review-content-{{ review.id }}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        {% if review.user.profile.avatar %}
+                            <img src="{{ review.user.profile.avatar.url }}" class="user-avatar" alt="avatar">
+                        {% else %}
+                            <div class="user-avatar" style="background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-color);"></div>
+                        {% endif %}
+                        <strong style="color: var(--accent-color);">{{ review.user.profile.nickname|default:review.user.username }}</strong>
+                    </div>
+                    <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10 ★</span>
+                </div>
+                <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
             </div>
-            <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
+
+            {% if user == review.user %}
+            <div id="edit-form-{{ review.id }}" class="inline-edit-form" style="display: none;">
+                <form method="post" action="{% url 'anime:edit_review' review.id %}">
+                    {% csrf_token %}
+                    <input type="number" name="rating" min="1" max="10" value="{{ review.rating }}"
+                           style="background: #141414; border: 1px solid var(--accent-color); color: #fff; width: 50px; padding: 5px;">
+                    <textarea name="text">{{ review.text }}</textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn-small">Зберегти</button>
+                        <button type="button" class="btn-small" style="background: #444; color: #fff;" onclick="closeEdit('{{ review.id }}')">Скасувати</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+            <div id="menu-{{ review.id }}" class="action-menu">
+                <a href="#review-form-anchor" onclick="activateReplyMagic('{{ review.id }}', '{{ review.user.username }}', false)">Відповісти</a>
+                {% if user == review.user %}
+                    <a href="javascript:void(0)" onclick="openEdit('{{ review.id }}')">Редагувати</a>
+                    <a href="{% url 'anime:delete_review' review.id %}" style="color: #ff4444;" onclick="return confirm('Видалити?')">Видалити</a>
+                {% endif %}
+            </div>
+
             <div style="margin-top: 10px; text-align: right;">
                 <small style="opacity: 0.5;">{{ review.created_at|date:"d.m.Y" }}</small>
             </div>
-        </div> {% empty %}
+        </div>
+
+        {% if review.replies.all %}
+            <div class="replies-branch" style="margin-left: 60px; margin-top: -20px; margin-bottom: 30px; border-left: 2px solid rgba(212, 175, 55, 0.15); padding-left: 20px;">
+                {% for reply in review.replies.all %}
+                    <div class="review-box" id="review-display-{{ reply.id }}" onclick="toggleReviewMenu(event, 'menu-{{ reply.id }}')" style="background: rgba(255, 255, 255, 0.01); margin-bottom: 10px; padding: 20px;">
+                        <div id="review-content-{{ reply.id }}">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    {% if reply.user.profile.avatar %}
+                                        <img src="{{ reply.user.profile.avatar.url }}" class="user-avatar" alt="avatar">
+                                    {% else %}
+                                        <div class="user-avatar" style="background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-color);">aww</div>
+                                    {% endif %}
+                                    <strong style="color: var(--accent-color);">{{ reply.user.profile.nickname|default:reply.user.username }}</strong>
+                                </div>
+                            </div>
+                            <p style="margin: 0; font-style: italic;">{{ reply.text }}</p>
+                        </div>
+
+                        {% if user == reply.user %}
+                        <div id="edit-form-{{ reply.id }}" class="inline-edit-form" style="display: none;">
+                            <form method="post" action="{% url 'anime:edit_review' reply.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="rating" value="{{ reply.rating }}">
+                                <textarea name="text">{{ reply.text }}</textarea>
+                                <div style="display: flex; gap: 10px;">
+                                    <button type="submit" class="btn-small">Зберегти</button>
+                                    <button type="button" class="btn-small" style="background: #444; color: #fff;" onclick="closeEdit('{{ reply.id }}')">Скасувати</button>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        <div id="menu-{{ reply.id }}" class="action-menu">
+                            <a href="#review-form-anchor" onclick="activateReplyMagic('{{ reply.id }}', '{{ reply.user.username }}', true)">Відповісти</a>
+                            {% if user == reply.user %}
+                                <a href="javascript:void(0)" onclick="openEdit('{{ reply.id }}')">Редагувати</a>
+                                <a href="{% url 'anime:delete_review' reply.id %}" style="color: #ff4444;" onclick="return confirm('Видалити?')">Видалити</a>
+                            {% endif %}
+                        </div>
+
+                        <div style="margin-top: 10px; text-align: right;">
+                            <small style="opacity: 0.5;">{{ reply.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    {% empty %}
         <p style="text-align: center; opacity: 0.5; padding: 20px;">Поки що немає відгуків</p>
     {% endfor %}
 
-    <a href="{% url 'anime:anime_list' %}" class="back-link">← Повернутися до бібліотеки</a>
-    </body>
-</html>
+    <a href="{% url 'anime:anime_list' %}" class="back-link">Повернутися до бібліотеки</a>
+</div>
+
+<script>
+    function activateReplyMagic(reviewId, username, isSubReply) {
+        const parentInput = document.getElementById('parent-id-input');
+        const banner = document.getElementById('reply-info-banner');
+        const targetUserSpan = document.getElementById('reply-target-user');
+        const ratingGroup = document.getElementById('rating-form-group');
+        const submitBtn = document.getElementById('submit-review-btn');
+        const textarea = document.getElementById('review-textarea');
+
+        if (parentInput && banner && targetUserSpan) {
+            parentInput.value = reviewId;
+            targetUserSpan.innerText = username;
+            banner.style.display = 'flex';
+
+            if (ratingGroup) ratingGroup.style.display = 'none';
+            if (submitBtn) submitBtn.innerText = 'Опублікувати відповідь';
+
+            if (isSubReply) {
+                textarea.value = `@${username}, `;
+            } else {
+                textarea.value = '';
+            }
+
+            textarea.placeholder = `Ваша відповідь для ${username}...`;
+            textarea.focus();
+        }
+    }
+
+    function cancelReplyMagic() {
+        const parentInput = document.getElementById('parent-id-input');
+        const banner = document.getElementById('reply-info-banner');
+        const ratingGroup = document.getElementById('rating-form-group');
+        const submitBtn = document.getElementById('submit-review-btn');
+        const textarea = document.getElementById('review-textarea');
+
+        if (parentInput && banner) {
+            parentInput.value = '';
+            banner.style.display = 'none';
+
+            if (ratingGroup) ratingGroup.style.display = 'flex';
+            if (submitBtn) submitBtn.innerText = 'Опублікувати відгук';
+
+            textarea.value = '';
+            textarea.placeholder = "Тут щось цікаве..";
+        }
+    }
+
+    function toggleReviewMenu(event, menuId) {
+        event.stopPropagation();
+        const allMenus = document.querySelectorAll('.action-menu');
+        allMenus.forEach(menu => { if (menu.id !== menuId) menu.classList.remove('show-menu'); });
+        document.getElementById(menuId).classList.toggle('show-menu');
+    }
+
+    function openEdit(id) {
+        document.getElementById('review-content-' + id).style.display = 'none';
+        document.getElementById('edit-form-' + id).style.display = 'block';
+        document.getElementById('menu-' + id).classList.remove('show-menu');
+    }
+
+    function closeEdit(id) {
+        document.getElementById('review-content-' + id).style.display = 'block';
+        document.getElementById('edit-form-' + id).style.display = 'none';
+    }
+
+    window.onclick = function() {
+        document.querySelectorAll('.action-menu').forEach(menu => menu.classList.remove('show-menu'));
+    };
+</script>
+{% endblock %}
