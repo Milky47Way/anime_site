@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from django.contrib.auth import views as auth_views
+from django.views.static import serve # Імпортуємо вбудований сервіс роздачі
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +28,11 @@ urlpatterns = [
     path('profiles/', include('profiles.urls')),
     path('characters/', include('characters.urls')),
     path('anime/', include('anime.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Напряму кажемо Django роздавати папку media за будь-яких умов
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]
