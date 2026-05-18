@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,11 +20,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mzhz0+_f^!a3-2tfdtre(g)xe0gf&+=*_4)&ukmh!du6kj5ikt'
-
+#SECRET_KEY = 'django-insecure-mzhz0+_f^!a3-2tfdtre(g)xe0gf&+=*_4)&ukmh!du6kj5ikt'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+#DEBUG = True
+#ALLOWED_HOSTS = ['*']
+
+
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'safe-development-key-12345')
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -49,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleWare'
 ]
 
 ROOT_URLCONF = 'anime_library.urls'
@@ -109,3 +117,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'anime4.7site@gmail.com'
 EMAIL_HOST_PASSWORD = 'joua uems civj aljt'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+#pip install gunicorn whitenoise
+#pip freeze > requirements.txt
