@@ -72,6 +72,7 @@ class AnimeDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         anime = self.object
         context['reviews'] = anime.reviews.all()
+        context['characters'] = anime.characters.all()
         return context
 
 @login_required
