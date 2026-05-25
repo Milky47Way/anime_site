@@ -3,7 +3,6 @@ import django
 import openpyxl
 from datetime import datetime, date
 
-# Настройка окружения Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'anime_library.settings')
 django.setup()
 
@@ -59,7 +58,6 @@ def import_from_excel():
         birthday = row[6]  # день народження
         family = row[7]  # сім'я
 
-        # Безопасное приведение возраста к числу
         try:
             age_val = int(age) if age is not None else None
         except (ValueError, TypeError):
@@ -67,11 +65,9 @@ def import_from_excel():
 
         birthday_val = parse_birthday(birthday)
 
-        # Получаем или создаем аниме (чисто по названию)
         anime_obj, _ = Anime.objects.get_or_create(title=anime_title)
 
         try:
-            # Ищем или создаем персонажа
             character_obj, created = Character.objects.get_or_create(
                 name=char_name,
                 anime=anime_obj,
@@ -83,8 +79,7 @@ def import_from_excel():
                 }
             )
 
-            # МАГИЯ ОБНОВЛЕНИЯ: Если персонаж уже был, мы всё равно обновляем ему описание,
-            # чтобы применить красивые переносы строк из Excel!
+        
             if not created and description:
                 character_obj.description = description
                 character_obj.role = role if role else character_obj.role
@@ -93,7 +88,6 @@ def import_from_excel():
                 character_obj.save()
                 print(f"🔄 Принудительно обновлены данные для: {char_name}")
 
-            # Обработка связей "Семья"
             if family:
                 try:
                     for name in str(family).split(','):
@@ -110,7 +104,7 @@ def import_from_excel():
         except Exception as e:
             print(f"❌ Ошибка при добавлении {char_name}: {e}")
 
-    print("Магия завершена! Все персонажи занесены в твои архивы. 🎉")
+    print("Все персонажи занесены в архивы. 🎉")
 
 
 if __name__ == '__main__':
