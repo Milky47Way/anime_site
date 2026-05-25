@@ -95,26 +95,39 @@ def toggle_watchlist(request, anime_id):
 def add_review(request, anime_id):
     if request.method == 'POST':
         anime_obj = get_object_or_404(Anime, pk=anime_id)
-        rating = request.POST.get('rating')
         text = request.POST.get('text')
-        parent_id = request.POST.get('parent_id')  # Ловим ID родительского отзыва
+        parent_id = request.POST.get('parent_id')
 
         if text:
-            # Если это ответ, то оценка не обязательна (ставим 10 по умолчанию или берем родительскую)
-            rating_val = rating if rating else 10
 
-            parent_obj = None
             if parent_id:
                 parent_obj = get_object_or_404(Review, pk=parent_id)
 
-            Review.objects.create(
-                anime=anime_obj,
-                user=request.user,
-                rating=rating_val,
-                text=text,
-                parent=parent_obj  # Сохраняем связь!
-            )
+                Review.objects.create(
+                    anime=anime_obj,
+                    user=request.user,
+                    rating=10,
+                    text=text,
+                    parent=parent_obj
+                )
+                print(f"✨ Создан ответ для отзыва #{parent_id}")
+            else:
+
+                rating = request.POST.get('rating')
+                rating_val = rating if rating else 10
+
+                Review.objects.create(
+                    anime=anime_obj,
+                    user=request.user,
+                    rating=rating_val,
+                    text=text,
+                    parent=None
+                )
+                print("✨ Создан новый главный отзыв")
+
             update_anime_rating(anime_obj)
+
+    return redirect('anime:anime_detail', pk=anime_id)
 
     return redirect('anime:anime_detail', pk=anime_id)
 @login_required

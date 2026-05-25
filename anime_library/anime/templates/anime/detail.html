@@ -364,98 +364,99 @@
     {% endif %}
 
     {% for review in reviews %}
-        <div class="review-box" id="review-display-{{ review.id }}" onclick="toggleReviewMenu(event, 'menu-{{ review.id }}')">
-            <div id="review-content-{{ review.id }}">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        {% if review.user.profile.avatar %}
-                            <img src="{{ review.user.profile.avatar.url }}" class="user-avatar" alt="avatar">
-                        {% else %}
-                            <div class="user-avatar" style="background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-color);"></div>
-                        {% endif %}
-                        <strong style="color: var(--accent-color);">{{ review.user.profile.nickname|default:review.user.username }}</strong>
-                    </div>
-                    <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10 ★</span>
-                </div>
-                <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
-            </div>
-
-            {% if user == review.user %}
-            <div id="edit-form-{{ review.id }}" class="inline-edit-form" style="display: none;">
-                <form method="post" action="{% url 'anime:edit_review' review.id %}">
-                    {% csrf_token %}
-                    <input type="number" name="rating" min="1" max="10" value="{{ review.rating }}"
-                           style="background: #141414; border: 1px solid var(--accent-color); color: #fff; width: 50px; padding: 5px;">
-                    <textarea name="text">{{ review.text }}</textarea>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn-small">Зберегти</button>
-                        <button type="button" class="btn-small" style="background: #444; color: #fff;" onclick="closeEdit('{{ review.id }}')">Скасувати</button>
-                    </div>
-                </form>
-            </div>
-            {% endif %}
-
-            <div id="menu-{{ review.id }}" class="action-menu">
-                <a href="#review-form-anchor" onclick="activateReplyMagic('{{ review.id }}', '{{ review.user.username }}', false)">Відповісти</a>
-                {% if user == review.user %}
-                    <a href="javascript:void(0)" onclick="openEdit('{{ review.id }}')">Редагувати</a>
-                    <a href="{% url 'anime:delete_review' review.id %}" style="color: #ff4444;" onclick="return confirm('Видалити?')">Видалити</a>
-                {% endif %}
-            </div>
-
-            <div style="margin-top: 10px; text-align: right;">
-                <small style="opacity: 0.5;">{{ review.created_at|date:"d.m.Y" }}</small>
-            </div>
-        </div>
-
-        {% if review.replies.all %}
-            <div class="replies-branch" style="margin-left: 60px; margin-top: -20px; margin-bottom: 30px; border-left: 2px solid rgba(212, 175, 55, 0.15); padding-left: 20px;">
-                {% for reply in review.replies.all %}
-                    <div class="review-box" id="review-display-{{ reply.id }}" onclick="toggleReviewMenu(event, 'menu-{{ reply.id }}')" style="background: rgba(255, 255, 255, 0.01); margin-bottom: 10px; padding: 20px;">
-                        <div id="review-content-{{ reply.id }}">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    {% if reply.user.profile.avatar %}
-                                        <img src="{{ reply.user.profile.avatar.url }}" class="user-avatar" alt="avatar">
-                                    {% else %}
-                                        <div class="user-avatar" style="background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-color);">aww</div>
-                                    {% endif %}
-                                    <strong style="color: var(--accent-color);">{{ reply.user.profile.nickname|default:reply.user.username }}</strong>
-                                </div>
-                            </div>
-                            <p style="margin: 0; font-style: italic;">{{ reply.text }}</p>
-                        </div>
-
-                        {% if user == reply.user %}
-                        <div id="edit-form-{{ reply.id }}" class="inline-edit-form" style="display: none;">
-                            <form method="post" action="{% url 'anime:edit_review' reply.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="rating" value="{{ reply.rating }}">
-                                <textarea name="text">{{ reply.text }}</textarea>
-                                <div style="display: flex; gap: 10px;">
-                                    <button type="submit" class="btn-small">Зберегти</button>
-                                    <button type="button" class="btn-small" style="background: #444; color: #fff;" onclick="closeEdit('{{ reply.id }}')">Скасувати</button>
-                                </div>
-                            </form>
-                        </div>
-                        {% endif %}
-
-                        <div id="menu-{{ reply.id }}" class="action-menu">
-                            <a href="#review-form-anchor" onclick="activateReplyMagic('{{ reply.id }}', '{{ reply.user.username }}', true)">Відповісти</a>
-                            {% if user == reply.user %}
-                                <a href="javascript:void(0)" onclick="openEdit('{{ reply.id }}')">Редагувати</a>
-                                <a href="{% url 'anime:delete_review' reply.id %}" style="color: #ff4444;" onclick="return confirm('Видалити?')">Видалити</a>
+        {% if not review.parent %}
+            <div class="review-box" id="review-display-{{ review.id }}" onclick="toggleReviewMenu(event, 'menu-{{ review.id }}')">
+                <div id="review-content-{{ review.id }}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            {% if review.user.profile.avatar %}
+                                <img src="{{ review.user.profile.avatar.url }}" class="user-avatar" alt="avatar">
+                            {% else %}
+                                <div class="user-avatar" style="background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-color);"></div>
                             {% endif %}
+                            <strong style="color: var(--accent-color);">{{ review.user.profile.nickname|default:review.user.username }}</strong>
                         </div>
-
-                        <div style="margin-top: 10px; text-align: right;">
-                            <small style="opacity: 0.5;">{{ reply.created_at|date:"d.m.Y" }}</small>
-                        </div>
+                        <span style="font-size: 0.9rem; font-weight: bold;">{{ review.rating }}/10 ★</span>
                     </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+                    <p style="margin: 0; font-style: italic;">"{{ review.text }}"</p>
+                </div>
 
+                {% if user == review.user %}
+                <div id="edit-form-{{ review.id }}" class="inline-edit-form" style="display: none;">
+                    <form method="post" action="{% url 'anime:edit_review' review.id %}">
+                        {% csrf_token %}
+                        <input type="number" name="rating" min="1" max="10" value="{{ review.rating }}"
+                               style="background: #141414; border: 1px solid var(--accent-color); color: #fff; width: 50px; padding: 5px;">
+                        <textarea name="text">{{ review.text }}</textarea>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn-small">Зберегти</button>
+                            <button type="button" class="btn-small" style="background: #444; color: #fff;" onclick="closeEdit('{{ review.id }}')">Скасувати</button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div id="menu-{{ review.id }}" class="action-menu">
+                    <a href="#review-form-anchor" onclick="activateReplyMagic('{{ review.id }}', '{{ review.user.username }}', false)">Відповісти</a>
+                    {% if user == review.user %}
+                        <a href="javascript:void(0)" onclick="openEdit('{{ review.id }}')">Редагувати</a>
+                        <a href="{% url 'anime:delete_review' review.id %}" style="color: #ff4444;" onclick="return confirm('Видалити?')">Видалити</a>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 10px; text-align: right;">
+                    <small style="opacity: 0.5;">{{ review.created_at|date:"d.m.Y" }}</small>
+                </div>
+            </div>
+
+            {% if review.replies.all %}
+                <div class="replies-branch" style="margin-left: 60px; margin-top: -20px; margin-bottom: 30px; border-left: 2px solid rgba(212, 175, 55, 0.15); padding-left: 20px;">
+                    {% for reply in review.replies.all %}
+                        <div class="review-box" id="review-display-{{ reply.id }}" onclick="toggleReviewMenu(event, 'menu-{{ reply.id }}')" style="background: rgba(255, 255, 255, 0.01); margin-bottom: 10px; padding: 20px;">
+                            <div id="review-content-{{ reply.id }}">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        {% if reply.user.profile.avatar %}
+                                            <img src="{{ reply.user.profile.avatar.url }}" class="user-avatar" alt="avatar">
+                                        {% else %}
+                                            <div class="user-avatar" style="background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-color);">aww</div>
+                                        {% endif %}
+                                        <strong style="color: var(--accent-color);">{{ reply.user.profile.nickname|default:reply.user.username }}</strong>
+                                    </div>
+                                </div>
+                                <p style="margin: 0; font-style: italic;">{{ reply.text }}</p>
+                            </div>
+
+                            {% if user == reply.user %}
+                            <div id="edit-form-{{ reply.id }}" class="inline-edit-form" style="display: none;">
+                                <form method="post" action="{% url 'anime:edit_review' reply.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="rating" value="{{ reply.rating }}">
+                                    <textarea name="text">{{ reply.text }}</textarea>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button type="submit" class="btn-small">Зберегти</button>
+                                        <button type="button" class="btn-small" style="background: #444; color: #fff;" onclick="closeEdit('{{ reply.id }}')">Скасувати</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+
+                            <div id="menu-{{ reply.id }}" class="action-menu">
+                                <a href="#review-form-anchor" onclick="activateReplyMagic('{{ reply.id }}', '{{ reply.user.username }}', true)">Відповісти</a>
+                                {% if user == reply.user %}
+                                    <a href="javascript:void(0)" onclick="openEdit('{{ reply.id }}')">Редагувати</a>
+                                    <a href="{% url 'anime:delete_review' reply.id %}" style="color: #ff4444;" onclick="return confirm('Видалити?')">Видалити</a>
+                                {% endif %}
+                            </div>
+
+                            <div style="margin-top: 10px; text-align: right;">
+                                <small style="opacity: 0.5;">{{ reply.created_at|date:"d.m.Y" }}</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
     {% empty %}
         <p style="text-align: center; opacity: 0.5; padding: 20px;">Поки що немає відгуків</p>
     {% endfor %}
