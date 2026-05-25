@@ -2,8 +2,11 @@ import os
 import django
 import openpyxl
 from datetime import datetime, date
+
+# Настройка окружения Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'anime_library.settings')
 django.setup()
+
 from anime.models import Anime
 from characters.models import Character
 
@@ -20,16 +23,16 @@ def parse_birthday(birthday):
     try:
         parts = b_str.split('.')
         if len(parts) == 3:
-            if len(parts[2]) == 4:
-                day, month, year = parts[0], parts[1], parts[2]
+            day, month, year = parts[0], parts[1], parts[2]
+            if len(year) == 4:
                 return f"{year}-{int(month):02d}-{int(day):02d}"
-            elif len(parts[0]) == 4:
+            elif len(day) == 4:
                 year, month, day = parts[0], parts[1], parts[2]
                 return f"{year}-{int(month):02d}-{int(day):02d}"
     except Exception:
         pass
 
-    return b_str
+    return None
 
 
 def import_from_excel():
@@ -48,24 +51,27 @@ def import_from_excel():
         if not row or len(row) < 3 or not row[2]:
             continue
 
-        number = row[0]  # №
         anime_title = row[1]  # аніме
         char_name = row[2]  # ім'я
         role = row[3]  # роль
         age = row[4]  # вік
-        description = row[5]  # опис
+        description = row[5]  # опис персонажа
         birthday = row[6]  # день народження
         family = row[7]  # сім'я
 
+        # Безопасное приведение возраста к числу
         try:
             age_val = int(age) if age is not None else None
         except (ValueError, TypeError):
             age_val = None
 
         birthday_val = parse_birthday(birthday)
+
+        # Получаем или создаем аниме (чисто по названию)
         anime_obj, _ = Anime.objects.get_or_create(title=anime_title)
 
         try:
+            # Ищем или создаем персонажа
             character_obj, created = Character.objects.get_or_create(
                 name=char_name,
                 anime=anime_obj,
@@ -73,36 +79,38 @@ def import_from_excel():
                     'role': role if role else '',
                     'age': age_val,
                     'description': description if description else '',
-                    'birthday': birthday_val if birthday_val else None,
+                    'birthday': birthday_val,
                 }
             )
 
+            # МАГИЯ ОБНОВЛЕНИЯ: Если персонаж уже был, мы всё равно обновляем ему описание,
+            # чтобы применить красивые переносы строк из Excel!
+            if not created and description:
+                character_obj.description = description
+                character_obj.role = role if role else character_obj.role
+                character_obj.age = age_val if age_val is not None else character_obj.age
+                character_obj.birthday = birthday_val if birthday_val else character_obj.birthday
+                character_obj.save()
+                print(f"🔄 Принудительно обновлены данные для: {char_name}")
+
+            # Обработка связей "Семья"
             if family:
                 try:
-                    related_model = Character._meta.get_field('family').remote_field.model
-
-                    if related_model == Character:
-                        for name in str(family).split(','):
-                            name = name.strip()
-                            if name:
-                                fam_char, _ = Character.objects.get_or_create(name=name, anime=anime_obj)
-                                character_obj.family.add(fam_char)
-                    else:
-                        fam_obj, _ = related_model.objects.get_or_create(name=str(family).strip())
-                        character_obj.family.add(fam_obj)
+                    for name in str(family).split(','):
+                        name = name.strip()
+                        if name:
+                            fam_char, _ = Character.objects.get_or_create(name=name, anime=anime_obj)
+                            character_obj.family.add(fam_char)
                 except Exception as m2m_err:
-                    print(f"⚠️ Предупреждение для {char_name}: не удалось связать поле family ({m2m_err})")
+                    print(f"⚠️ Не удалось связать поле family для {char_name}: {m2m_err}")
 
             if created:
                 print(f"✨ Добавлен персонаж: {char_name} ({anime_title})")
-            else:
-                print(f" Пропущен (уже есть в базе): {char_name}")
 
         except Exception as e:
             print(f"❌ Ошибка при добавлении {char_name}: {e}")
-            return
 
-    print("Магия завершена! Все персонажи успішно занесені в твої архіви. 🎉")
+    print("Магия завершена! Все персонажи занесены в твои архивы. 🎉")
 
 
 if __name__ == '__main__':
