@@ -153,14 +153,12 @@
         <div class="character-info">
             <h1>{{ character.name }}</h1>
             <div class="char-role">{{ character.role }}</div>
-
-            <div class="char-desc">
-                {% if character.description %}
-                    {{ character.description|linebreaks }}
-                {% else %}
-                    <p style="font-style: italic; opacity: 0.6;">Біографія цього персонажа ще оповита таємницею...</p>
-                {% endif %}
-            </div>
+<div class="char-desc">
+    {% if character.description %}
+        {{ character.description|linebreaks }}  {% else %}
+        <p style="font-style: italic; opacity: 0.6;">Біографія цього персонажа ще оповита таємницею...</p>
+    {% endif %}
+</div>
 
             {% if character.anime %}
                 <a href="{% url 'anime:anime_detail' character.anime.pk %}" class="anime-link">

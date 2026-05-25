@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
+from django_ckeditor_5.fields import CKEditor5Field
 
 class Genre(models.Model):
     name = models.CharField("Жанр", max_length=50, unique=True)
@@ -37,7 +38,7 @@ class DubStudio(models.Model):
 class Anime(models.Model):
     title = models.CharField("Назва", max_length=250)
     poster = models.ImageField("Постер", upload_to='images/posters')
-    description = models.TextField("Опис")
+    description = models.TextField("Опис", blank=True)
     age_rating = models.CharField(max_length=15, blank=True, null=True, verbose_name="Віковий рейтинг")
     related_anime = models.ManyToManyField('self', blank=True, verbose_name="Пов'язані тайтли")
 
