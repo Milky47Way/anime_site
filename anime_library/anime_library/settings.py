@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'anime',
     'profiles',
     'characters',
-    'django_ckeditor_5'
 ]
 
 MEDIA_URL = '/media/'
