@@ -99,23 +99,26 @@ def add_review(request, anime_id):
         parent_id = request.POST.get('parent_id')
 
         if text:
-
             if parent_id:
                 parent_obj = get_object_or_404(Review, pk=parent_id)
+                
+                # ВОТ ОНА, МАГИЯ: если тот коммент, на который мы отвечаем, 
+                # САМ является чьим-то ответом (у него есть parent),
+                # то мы берём его родителя. Так вся ветка останется под главным отзывом!
+                actual_parent = parent_obj.parent if parent_obj.parent else parent_obj
 
                 Review.objects.create(
                     anime=anime_obj,
                     user=request.user,
-                    rating=10,
+                    rating=10, 
                     text=text,
-                    parent=parent_obj
+                    parent=actual_parent  # Привязываем строго к корневому отзыву
                 )
-                print(f"✨ Создан ответ для отзыва #{parent_id}")
+                print(f"✨ Создан ответ в ветке отзыва #{actual_parent.id}")
             else:
-
                 rating = request.POST.get('rating')
                 rating_val = rating if rating else 10
-
+                
                 Review.objects.create(
                     anime=anime_obj,
                     user=request.user,
@@ -126,8 +129,6 @@ def add_review(request, anime_id):
                 print("✨ Создан новый главный отзыв")
 
             update_anime_rating(anime_obj)
-
-    return redirect('anime:anime_detail', pk=anime_id)
 
     return redirect('anime:anime_detail', pk=anime_id)
 @login_required
