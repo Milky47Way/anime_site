@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'anime',
     'profiles',
     'characters',
+    'django_ckeditor_5'
 ]
 
 MEDIA_URL = '/media/'
@@ -60,6 +61,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'anime_library.urls'
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+    }
+}
 
 TEMPLATES = [
     {
@@ -83,6 +90,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
