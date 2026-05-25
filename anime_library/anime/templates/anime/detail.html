@@ -261,31 +261,32 @@
             {% if anime.trailer_url %}
                 <a href="{{ anime.trailer_url }}" target="_blank" class="trailer-btn">Дивитися трейлер</a>
             {% endif %}
-        </div>
+       </div>
 
-        {% if anime.poster %}
-        <div class="anime-poster-wrapper">
-            <img src="{{ anime.poster.url }}" alt="{{ anime.title }}" class="poster-img">
-        </div>
-        {% endif %}
+    {% if anime.poster %}
+    <div class="anime-poster-wrapper">
+        <img src="{{ anime.poster.url }}" alt="{{ anime.title }}" class="poster-img">
     </div>
-
-    <h3>Опис</h3>
-    <p>{{ anime.description }}</p>
-
-    {% if anime.related_anime.all %}
-        <h3>Пов'язані тайтли</h3>
-        <ul style="list-style: none; padding: 0; margin-bottom: 25px;">
-            {% for related in anime.related_anime.all %}
-                <li style="margin-bottom: 10px; padding-left: 8px; border-left: 2px solid var(--accent-color, #d4af37); transition: all 0.3s ease;">
-                    ⭐ <a href="{% url 'anime:anime_detail' related.pk %}" style="font-weight: bold; text-decoration: none; color: #f5f5dc;">
-                        {{ related.title }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
     {% endif %}
+</div>
 
+<h3>Опис</h3>
+<div class="char-desc" style="background: rgba(31, 31, 31, 0.4); padding: 25px; border-radius: 16px; border-left: 3px solid var(--accent-color, #d4af37); box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3); margin-bottom: 30px; color: #e6dfd3; line-height: 1.8; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);">
+    {{ anime.description|linebreaks }}
+</div>
+
+{% if anime.related_anime.all %}
+    <h3>Пов'язані тайтли</h3>
+    <ul style="list-style: none; padding: 0; margin-bottom: 25px;">
+        {% for related in anime.related_anime.all %}
+            <li style="margin-bottom: 10px; padding-left: 8px; border-left: 2px solid var(--accent-color, #d4af37); transition: all 0.3s ease;">
+                ⭐ <a href="{% url 'anime:anime_detail' related.pk %}" style="font-weight: bold; text-decoration: none; color: #f5f5dc;">
+                    {{ related.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
   <hr>
     <h3>Персонажі</h3>
     <ul style="list-style: none; padding: 0; margin-bottom: 20px;">

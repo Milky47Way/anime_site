@@ -97,18 +97,26 @@ def add_review(request, anime_id):
         anime_obj = get_object_or_404(Anime, pk=anime_id)
         rating = request.POST.get('rating')
         text = request.POST.get('text')
+        parent_id = request.POST.get('parent_id')  # Ловим ID родительского отзыва
 
-        if rating and text:
+        if text:
+            # Если это ответ, то оценка не обязательна (ставим 10 по умолчанию или берем родительскую)
+            rating_val = rating if rating else 10
+
+            parent_obj = None
+            if parent_id:
+                parent_obj = get_object_or_404(Review, pk=parent_id)
+
             Review.objects.create(
                 anime=anime_obj,
                 user=request.user,
-                rating=rating,
-                text=text
+                rating=rating_val,
+                text=text,
+                parent=parent_obj  # Сохраняем связь!
             )
             update_anime_rating(anime_obj)
 
     return redirect('anime:anime_detail', pk=anime_id)
-
 @login_required
 def edit_review(request, review_id):
     review = get_object_or_404(Review, pk=review_id)
