@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
-from django_ckeditor_5.fields import CKEditor5Field
 
 class Genre(models.Model):
     name = models.CharField("Жанр", max_length=50, unique=True)
