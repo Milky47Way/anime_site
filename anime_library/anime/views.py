@@ -102,17 +102,17 @@ def add_review(request, anime_id):
             if parent_id:
                 parent_obj = get_object_or_404(Review, pk=parent_id)
                 
-                # ВОТ ОНА, МАГИЯ: если тот коммент, на который мы отвечаем, 
-                # САМ является чьим-то ответом (у него есть parent),
-                # то мы берём его родителя. Так вся ветка останется под главным отзывом!
-                actual_parent = parent_obj.parent if parent_obj.parent else parent_obj
+                # БЕЗОТКАЗНЫЙ ЦИКЛ: поднимаемся до самого корня ветки
+                actual_parent = parent_obj
+                while actual_parent.parent is not None:
+                    actual_parent = actual_parent.parent
 
                 Review.objects.create(
                     anime=anime_obj,
                     user=request.user,
-                    rating=10, 
+                    rating=10,
                     text=text,
-                    parent=actual_parent  # Привязываем строго к корневому отзыву
+                    parent=actual_parent  # Теперь это ЖЕСТКО самый верхний отзыв
                 )
                 print(f"✨ Создан ответ в ветке отзыва #{actual_parent.id}")
             else:
